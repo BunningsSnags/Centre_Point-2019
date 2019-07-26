@@ -12,6 +12,7 @@ void LRFs::init() {
     lrfBack1.begin(SERIAL_BAUD_RATE);
     lrfBack2.begin(SERIAL_BAUD_RATE);
     lrfRight1.begin(SERIAL_BAUD_RATE);
+}
 
 void LRFs::update() {
     if(Serial1.available() >= LRF_PACKET_SIZE) {

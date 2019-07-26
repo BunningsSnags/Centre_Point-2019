@@ -8,10 +8,13 @@
 #define SERIAL_BAUD_RATE 9600
 
 // ----------- LRF Stuff -----------
-#define HARDWARE_LRFS_NUM 3
+#define HARDWARE_LRFS_NUM 5
 #define LRF_PACKET_SIZE 8
-#define LRF_NUM 3
-// #define SOFTWARE_LRFS_NUM 5
+#define LRF_NUM 8
+#define SOFTWARE_LRFS_NUM 3
+
+// ----------- LEDs -----------
+#define ledPin 13
 
 // ----------- Motor Defines -----------
 #define RIGHT_PWM 2
