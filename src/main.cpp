@@ -51,7 +51,7 @@ void loop() {
     //     printer();
     //     flash();
     // }
-    Serial.print(" I am out of true loop");
+    Serial.print("I am before read");
     if (temp.read()) {
         Serial.print("I Have Read");
         float ambientT = temp.ambient(); // Get updated ambient temperature
