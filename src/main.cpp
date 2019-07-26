@@ -16,23 +16,36 @@ Timer turnTimer(1000000);
 Timer LEDTimer(800000);
 bool ledOn = false;
 
+    // ------------ Random ------------
+char answer[10];
+int num = 0;
+
+    //  ------------ Temp Recordings  ------------
+void tempRead() {
+    if (temp.read()) {
+        float ambientT = temp.ambient();
+        float objectT = temp.object();
+        Serial.println("Ambient: " + String(ambientT));
+        Serial.println("Object: " + String(objectT));
+    }
+}
     // ------------ LED Flash ------------
-void flash(){
+void flash() {
     if(LEDTimer.timeHasPassed()){
         digitalWrite(ledPin, ledOn);
         ledOn = !ledOn;
     }
 
 }
-
     // ------------ LRF Print ------------
-void printer(){
+void lrfRead(){
     for(int i = 0; i < LRF_NUM; i++) {
         Serial.print(lrfs.value[i]);
         Serial.print("\t");
     }
     Serial.println("Front-Left, Front-Right, Left-Left, Left-Right, Back-Left, Back-Right, Right-Left, Right-Right");
 }
+
     // ------------ Normal Setup ------------
 void setup() {
     lrfs.init();
@@ -41,24 +54,16 @@ void setup() {
     digitalWrite(ledPin, HIGH);
     digitalWrite(ledPin, LOW);
     temp.begin();
-    temp.setUnit(TEMP_F);
+    temp.setUnit(TEMP_C);
 }
 
 // ============ Main ============
 void loop() {
-    // ------------ Debuging ------------
-    // while(true){
-    //     printer();
-    //     flash();
-    // }
-    Serial.print("I am before read");
-    if (temp.read()) {
-        Serial.print("I Have Read");
-        float ambientT = temp.ambient(); // Get updated ambient temperature
-        float objectT = temp.object(); // Get updated object temperature
-        Serial.println("Ambient: " + String(ambientT));
-        Serial.println("Object: " + String(objectT));
-        Serial.println();
+    //------------ Debuging ------------
+    while(true){
+        flash();
+        tempRead();
+        //lrfRead();
     }
-    motors.update(-50, 50);
+    
 }
