@@ -4,11 +4,12 @@
 #include <Motors.h>
 #include <Common.h>
 #include <Timer.h>
+#include <SparkFunMLX90614.h>
 
 // ============ Setups ============
 LRFs lrfs;
 Motors motors;
-
+IRTherm temp;
     // ------------ Timers ------------
 Timer cubeTimer(80000);
 Timer turnTimer(1000000);
@@ -17,7 +18,7 @@ bool ledOn = false;
 
     // ------------ LED Flash ------------
 void flash(){
-    if(turnTimer.timeHasPassed()){
+    if(LEDTimer.timeHasPassed()){
         digitalWrite(ledPin, ledOn);
         ledOn = !ledOn;
     }
@@ -39,14 +40,25 @@ void setup() {
     pinMode(ledPin, OUTPUT);
     digitalWrite(ledPin, HIGH);
     digitalWrite(ledPin, LOW);
+    temp.begin();
+    temp.setUnit(TEMP_F);
 }
 
 // ============ Main ============
 void loop() {
     // ------------ Debuging ------------
-    while(true){
-        // printer();
-        flash();
+    // while(true){
+    //     printer();
+    //     flash();
+    // }
+    Serial.print(" I am out of true loop");
+    if (temp.read()) {
+        Serial.print("I Have Read");
+        float ambientT = temp.ambient(); // Get updated ambient temperature
+        float objectT = temp.object(); // Get updated object temperature
+        Serial.println("Ambient: " + String(ambientT));
+        Serial.println("Object: " + String(objectT));
+        Serial.println();
     }
     motors.update(-50, 50);
 }
