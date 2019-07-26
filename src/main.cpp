@@ -1,3 +1,4 @@
+
 // ============ Includes ============
 #include <LRFs.h>
 #include <Motors.h>
@@ -9,13 +10,14 @@ LRFs lrfs;
 Motors motors;
 
     // ------------ Timers ------------
-Timer RGBTimer(800000);
+Timer cubeTimer(80000);
+Timer turnTimer(1000000);
 Timer LEDTimer(800000);
 bool ledOn = false;
 
     // ------------ LED Flash ------------
 void flash(){
-    if(LEDTimer.timeHasPassed()){
+    if(turnTimer.timeHasPassed()){
         digitalWrite(ledPin, ledOn);
         ledOn = !ledOn;
     }
@@ -43,12 +45,8 @@ void setup() {
 void loop() {
     // ------------ Debuging ------------
     while(true){
-        printer();
+        // printer();
         flash();
     }
     motors.update(-50, 50);
-
-
-
-
 }
