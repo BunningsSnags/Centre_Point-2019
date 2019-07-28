@@ -2,49 +2,58 @@
 #define COMMON_H
 
 #include <Arduino.h>
+#include <Pins.h>
 
-#define DEBUG true
 
-#define SERIAL_BAUD_RATE 9600
+// Debug
+#define DEBUG false
+#define TEENSY_BAUD_RATE 9600
 
-// ----------- LRF Stuff -----------
-#define HARDWARE_LRFS_NUM 5
-#define LRF_PACKET_SIZE 8
+
+// Communications
+#define SLAVE_PACKET_SIZE 12
+#define SLAVE_START_BYTE 255
+
+
+// LRFs
+#define LRF_BAUD_RATE 9600
 #define LRF_NUM 8
-#define SOFTWARE_LRFS_NUM 3
+#define LRF_PACKET_SIZE 8
 
-// ----------- LEDs -----------
-#define ledPin 13
 
-// ----------- Motor Defines -----------
-#define RIGHT_PWM 2
-#define RIGHT_INONE 26
-#define RIGHT_INTWO 27
-#define LEFT_PWM 3
-#define LEFT_INONE 28
-#define LEFT_INTWO 29
+//MPU
+#define MPU_CALIBRATION_COUNT 20
+#define MPU_CALIBRATION_TIME 50
+#define MPU9250_ADDRESS 0x68
+#define MAG_ADDRESS 0x0C
+#define GYRO_FULL_SCALE_250_DPS 0x00
+#define GYRO_FULL_SCALE_500_DPS 0x08
+#define GYRO_FULL_SCALE_1000_DPS 0x10
+#define GYRO_FULL_SCALE_2000_DPS 0x18
+#define ACC_FULL_SCALE_2_G 0x00
+#define ACC_FULL_SCALE_4_G 0x08
+#define ACC_FULL_SCALE_8_G 0x10
+#define ACC_FULL_SCALE_16_G 0x18
 
-// ----------- Stepper Motors -----------
-#define STEP_PWM
-#define STEP_INONE
-#define STEP_INTWO
-#define STEP_
 
-// ----------- Light Sensor -----------
-#define frontLight A0
-#define backLight A1
+// Thermal Sensors
+#define THERMAL_NUM 4
+#define THERMAL_CALIBRATION_COUNT 5
+#define THERMAL_CALIBRATION_TIME 50
 
-// ----------- unknown -----------
+
 struct Coordinate {
-    float x;
-    float y;
-    float z;
+    int8_t x;
+    int8_t y;
+    int8_t z;
 };
 
-// ----------- Camera Stuff -----------
+struct Vector3D {
+	float x;
+	float y;
+	float z;
+};
 
-// ----------- Arrays -----------
-#define WIDTH 10
-#define HEIGHT 10
+float floatMod(float x, float m);
 
 #endif

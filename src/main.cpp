@@ -1,4 +1,3 @@
-
 // ============ Includes ============
 #include <LRFs.h>
 #include <Motors.h>
@@ -16,10 +15,6 @@ Timer turnTimer(1000000);
 Timer LEDTimer(800000);
 bool ledOn = false;
 
-    // ------------ Random ------------
-char answer[10];
-int num = 0;
-
     //  ------------ Temp Recordings  ------------
 void tempRead() {
     if (temp.read()) {
@@ -27,6 +22,7 @@ void tempRead() {
         float objectT = temp.object();
         Serial.println("Ambient: " + String(ambientT));
         Serial.println("Object: " + String(objectT));
+        Serial.println();
     }
 }
     // ------------ LED Flash ------------
@@ -65,86 +61,75 @@ void loop() {
         tempRead();
         //lrfRead();
     }
-    while(lrfs.value[0] && lrfs.value[1] > 300){
-    // ----------- Random left turn -----------
-    if(lrfs.value[2] > 150 && lrfs.value[3] > 150){
-      motors.update(80, 80);
-      delay(700);
-      if(lrfs.value[3] != ((lrfs.value[4] - 5) < lrfs.value[4] < (lrfs.value[4] + 5))){
-        motors.update(-80, 80);
-      }
-    }
-    motors.update(80, 80);
-    // ----------- Not straight -----------
-        // to far left
-    if(lrfs.value[2] < 150 && lrfs.value[3] < 150 && lrfs.value[6] < 150 && lrfs.value[7] < 150){
-      if((lrfs.value[2] || lrfs.value[3]) < (lrfs.value[6] || lrfs.value[7])){
-        motors.update(90, 75);
-      }
-      // to far right 
-      if(lrfs.value[6] || lrfs.value[7] < lrfs.value[2] || lrfs.value[3]){
-        motors.update(75, 90);
-      }
-    }
-    // ----------- Black Square -----------
-    if(analogRead(frontLight) || analogRead(backLight) < 70){
-      // Left escape
-      if(lrfs.value[2] && lrfs.value[3] > 250){
-        motors.update(80, -80);
-        delay(1000);
-          // turn until straight
-        while(lrfs.value[4] != lrfs.value[5]){
-          motors.update(80, -80);
-        }
-      }
-      // Right escape
-      if(lrfs.value[6] && lrfs.value[7] > 250){
-        motors.update(-80, 80);
-        delay(1000);
-          // turn until straight
-        while(lrfs.value[4] != lrfs.value[5]){
-          motors.update(-80, 80);
-        }
-      }
-      // No turns out of black square
-      else{
-        motors.update(-80, 80);
-        delay(1000);
-          // Turn until sideways
-        while(lrfs.value[4] != lrfs.value[5]){
-          motors.update(-80, 80);
-        }
-        // Second turn around for full 180
-        motors.update(-80, 80);
-        delay(1000);
-          // turn until straight again
-        while(lrfs.value[4] != lrfs.value[5]){
-          motors.update(-80, 80);
-        }
-      }
-    }
-  }
-// ============ Turn visable ============
-  // ----------- Robot is straight -----------
-  while(lrfs.value[0] > 150 && lrfs.value[1] > 150){
-    motors.update(80, 80);
-      // turn left
-    if(250 < lrfs.value[2] > 255 && 250 < lrfs.value[3] < 255){
-      motors.update(80, -80);
-      delay(1000);                      /* This is just to make it turn a tinny bit first so sensors arent already equal */
-        // turn until straight
-      while(lrfs.value[4] != lrfs.value[5]){
-        motors.update(60, -60);
-      }
-    }
-  }
-    // turn right
-  if(250 < lrfs.value[6] > 255 && 250 < lrfs.value[7] < 255){
-    motors.update(-80, 80);
-    delay(1000);                     /* This is just to make it turn a tinny bit first so sensors arent already equal */
-      // turn until straight
-    while(lrfs.value[4] != lrfs.value[5]){
-      motors.update(-60, 60);
-    }
-  }
+//     while(lrfs.value[0] && lrfs.value[1] > 300){
+//     // ----------- Random left turn -----------
+//     if(lrfs.value[2] > 150 && lrfs.value[3] > 150){
+//       motors.update(80, 80);
+//       delay(700);
+//       if(lrfs.value[3] != ((lrfs.value[4] - 5) < lrfs.value[4] < (lrfs.value[4] + 5))){
+//         motors.update(-80, 80);
+//       }
+//     }
+//     motors.update(80, 80);
+//     // ----------- Black Square -----------
+//     if(analogRead(frontLight) || analogRead(backLight) < 70){
+//       // Left escape
+//       if(lrfs.value[2] && lrfs.value[3] > 250){
+//         motors.update(80, -80);
+//         delay(1000);
+//           // turn until straight
+//         while(lrfs.value[4] != lrfs.value[5]){
+//           motors.update(80, -80);
+//         }
+//       }
+//       // Right escape
+//       if(lrfs.value[6] && lrfs.value[7] > 250){
+//         motors.update(-80, 80);
+//         delay(1000);
+//           // turn until straight
+//         while(lrfs.value[4] != lrfs.value[5]){
+//           motors.update(-80, 80);
+//         }
+//       }
+//       // No turns out of black square
+//       else{
+//         motors.update(-80, 80);
+//         delay(1000);
+//           // Turn until sideways
+//         while(lrfs.value[4] != lrfs.value[5]){
+//           motors.update(-80, 80);
+//         }
+//         // Second turn around for full 180
+//         motors.update(-80, 80);
+//         delay(1000);
+//           // turn until straight again
+//         while(lrfs.value[4] != lrfs.value[5]){
+//           motors.update(-80, 80);
+//         }
+//       }
+//     }
+//   }
+// // ============ Turn visable ============
+//   // ----------- Robot is straight -----------
+//   while(lrfs.value[0] > 150 && lrfs.value[1] > 150){
+//     motors.update(80, 80);
+//       // turn left
+//     if(250 < lrfs.value[2] > 255 && 250 < lrfs.value[3] < 255){
+//       motors.update(80, -80);
+//       delay(1000);                      /* This is just to make it turn a tinny bit first so sensors arent already equal */
+//         // turn until straight
+//       while(lrfs.value[4] != lrfs.value[5]){
+//         motors.update(60, -60);
+//       }
+//     }
+//   }
+//     // turn right
+//   if(250 < lrfs.value[6] > 255 && 250 < lrfs.value[7] < 255){
+//     motors.update(-80, 80);
+//     delay(1000);                     /* This is just to make it turn a tinny bit first so sensors arent already equal */
+//       // turn until straight
+//     while(lrfs.value[4] != lrfs.value[5]){
+//       motors.update(-60, 60);
+//     }
+//   }
 }
