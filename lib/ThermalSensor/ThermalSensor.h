@@ -36,6 +36,7 @@ public:
     ThermalSensor() {};
     void init();
     void update();
+    void print();
     bool victim[THERMAL_NUM] = {false};
 private:
     void calibrate();

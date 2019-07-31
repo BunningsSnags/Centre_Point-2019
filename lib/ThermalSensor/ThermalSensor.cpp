@@ -6,6 +6,14 @@ void ThermalSensor::init() {
     calibrate();
 }
 
+void ThermalSensor::print() {
+    for(int i = 0; i < THERMAL_NUM; i++) {
+        Serial.print(victim[i]);
+        Serial.print("\t");
+    }
+    Serial.println("Front, Left, Back, Right");
+}
+
 void ThermalSensor::update() {
     Wire1.beginTransmission(MLX90614_I2CADDR);
     Wire1.write(MLX90614_TA);
