@@ -7,6 +7,19 @@ void LRFs::init() {
     Serial5.begin(LRF_BAUD_RATE);
 }
 
+    // ------------ LRF Print ------------
+void LRFs::print(){
+    for(int i = 0; i < LRF_NUM; i++) {
+        Serial.print(value[i]);
+        Serial.print("\t");
+    }
+    Serial.println("Front-Left, Front-Right, Left-Left, Left-Right, Back-Left, Back-Right, Right-Left, Right-Right");
+}
+
+int LRFs::average(uint8_t lrf1, uint8_t lrf2){
+   return (lrf1 + lrf2)/2
+}
+
 void LRFs::update() {
     if(Serial2.available() >= LRF_PACKET_SIZE) {
         uint8_t firstByte = Serial2.read();
