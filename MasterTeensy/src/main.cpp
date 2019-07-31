@@ -1,13 +1,36 @@
+// ============ Includes ============
 #include <LRFs.h>
 #include <Motors.h>
 #include <MPU.h>
 #include <ThermalSensor.h>
+#include <Timer.h>
+// #include <LEDs.h>
 
+// ============ Setups ============
 LRFs lrfs;
 Motors motors;
 MPU imu;
 ThermalSensor thermals;
+// 
+Timer cubeTimer(80000);
+Timer turnTimer(1000000);
+Timer LEDTimer(800000);
+bool ledOn = false;
 
+    // ------------ Main Flash ------------
+void teensyFlash() {
+    if(LEDTimer.timeHasPassed()){
+        digitalWrite(ledPin, ledOn);
+        ledOn = !ledOn;
+    }
+}
+
+// ============ algorithms ============
+void moreSpace(){
+    if()
+}
+
+// ============ Slave Teensy ============
 void receive() {
     if(Serial1.available() >= SLAVE_PACKET_SIZE) {
         uint8_t firstByte = Serial1.read();
@@ -27,6 +50,7 @@ void receive() {
     }
 }
 
+// ============ Setup ============
 void setup() {
     #if DEBUG
         Serial.begin(TEENSY_BAUD_RATE);
@@ -38,10 +62,17 @@ void setup() {
     thermals.init();
 }
 
+// ============ Main ============
 void loop() {
+    // ------------ Debuging ------------
+    while(true){
+        teensyFlash();
+        //tempRead();
+        lrfRead();
+    }
+    receive();
     lrfs.update();
-    motors.update(50, 50);
     imu.update();
     thermals.update();
-    receive();
+    motors.update(50, 50);
 }
