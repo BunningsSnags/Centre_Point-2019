@@ -1,13 +1,17 @@
-#ifndef PINS_H
-#define PINS_H
+#ifndef PINS_H_
+#define PINS_H_
 
 // Motors
-#define RIGHT_PWM 30
-#define RIGHT_INONE 28
-#define RIGHT_INTWO 27
-#define LEFT_PWM 29
-#define LEFT_INONE 26
+#define LEFT_PWM 21
+#define LEFT_INONE 24
 #define LEFT_INTWO 25
+#define RIGHT_PWM 20
+#define RIGHT_INONE 27
+#define RIGHT_INTWO 26
 
 
-#endif
+// LED Pins
+#define TEENSY_LED 13
+
+
+#endif // PINS_H_
