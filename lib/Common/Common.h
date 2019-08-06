@@ -3,4 +3,9 @@
 #include <Pins.h>
 #include <Arduino.h>
 
-#endif // COMMON_H_
+// LRFs
+#define LRF_BAUD_RATE 9600
+#define LRF_NUM 8
+#define LRF_PACKET_SIZE 8
+
+#endif
