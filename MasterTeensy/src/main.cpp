@@ -28,7 +28,7 @@ void tileMove(char direction) {
         motors.update(-100, 100);
         //Function for imu degrees(TILE_TURN_DEG)
     } else if(direction == "right") {
-        motors.update(-100, 100);
+        motors.update(100, -100);
         //Function for imu degrees(TILE_TURN_DEG)
     } else {
         Serial.printnl('Unknown direction, please use:')
