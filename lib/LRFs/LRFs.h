@@ -8,10 +8,7 @@ public:
     LRFs() {}
     void init();
     void update();
-    void print();
-private:
-    int num = 0;
-
-}
+    uint16_t value[LRF_NUM] = {0};
+};
 
 #endif

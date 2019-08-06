@@ -7,28 +7,54 @@ void LRFs::init() {
     Serial5.begin(LRF_BAUD_RATE);
 }
 
-void LRFs::print(){
-    for(int i = 0; i < LRF_NUM; i++) {
-        Serial.print(value[i]);
-        Serial.print("\t");
-    }
-    Serial.println("Front-Left, Front-Right, Left-Left, Left-Right, Back-Left, Back-Right, Right-Left, Right-Right");
-}
-
-HardwareSerial serials[] = {Serial2, Serial3, Serial4, Serial5};
+// HardwareSerial Serial2[] = {Serial2, Serial3, Serial4, Serial5};
 void LRFs::update() {
-    for(int i = 0; i < LRF_NUM; i++) {
-        if(serials.available()>=8){
-        int firstbyte = serials.read();
-            if(firstbyte == 90){
-                if(serials.read()==firstbyte){t4g
-                    serials.read();
-                    serials.read();
-                    int highbyte = serials.read();
-                    int lowbyte = serials.read();
-                    value[i] = highbyte << 8 | lowbyte;
-                }
-            }
+    while(Serial2.available() >= LRF_PACKET_SIZE) {
+        uint8_t firstbyte = Serial2.read();
+        uint8_t secondbyte = Serial2.peek();
+        if(firstbyte == 90 && secondbyte == 90) {
+            Serial2.read();
+            Serial2.read();
+            Serial2.read();
+            uint8_t highbyte = Serial2.read();
+            uint8_t lowbyte = Serial2.read();
+            value[0] = highbyte << 8 | lowbyte;
+        }
+    }
+    while(Serial3.available() >= LRF_PACKET_SIZE) {
+        uint8_t firstbyte = Serial3.read();
+        uint8_t secondbyte = Serial3.peek();
+        if(firstbyte == 90 && secondbyte == 90) {
+            Serial3.read();
+            Serial3.read();
+            Serial3.read();
+            uint8_t highbyte = Serial3.read();
+            uint8_t lowbyte = Serial3.read();
+            value[1] = highbyte << 8 | lowbyte;
+        }
+    }
+    while(Serial4.available() >= LRF_PACKET_SIZE) {
+        uint8_t firstbyte = Serial4.read();
+        uint8_t secondbyte = Serial4.peek();
+        if(firstbyte == 90 && secondbyte == 90) {
+            Serial4.read();
+            Serial4.read();
+            Serial4.read();
+            uint8_t highbyte = Serial4.read();
+            uint8_t lowbyte = Serial4.read();
+            value[2] = highbyte << 8 | lowbyte;
+        }
+    }
+    while(Serial5.available() >= LRF_PACKET_SIZE) {
+        uint8_t firstbyte = Serial5.read();
+        uint8_t secondbyte = Serial5.peek();
+        if(firstbyte == 90 && secondbyte == 90) {
+            Serial5.read();
+            Serial5.read();
+            Serial5.read();
+            uint8_t highbyte = Serial5.read();
+            uint8_t lowbyte = Serial5.read();
+            value[3] = highbyte << 8 | lowbyte;
         }
     }
 }
