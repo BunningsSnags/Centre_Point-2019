@@ -9,7 +9,8 @@
 #define LRF_PACKET_SIZE 8
 
 // Tile Spacing
-#define TILE_DIST_SEC 2000
+#define TILE_SIZE 300
+#define TILE_DIST_SEC 3000
 #define TILE_TURN_SEC
 #define TILE_TURN_DEG
 
