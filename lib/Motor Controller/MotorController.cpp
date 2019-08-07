@@ -12,12 +12,12 @@ void MotorController::init() {
 
 void MotorController::update(int16_t left, int16_t right) {
     if(left > 0) {
-        digitalWrite(LEFT_INONE, HIGH);
-        digitalWrite(LEFT_INTWO, LOW);
-        analogWrite(LEFT_PWM, abs(left));
-    } else if(left < 0) {
         digitalWrite(LEFT_INONE, LOW);
         digitalWrite(LEFT_INTWO, HIGH);
+        analogWrite(LEFT_PWM, abs(left));
+    } else if(left < 0) {
+        digitalWrite(LEFT_INONE, HIGH);
+        digitalWrite(LEFT_INTWO, LOW);
         analogWrite(LEFT_PWM, abs(left));
     } else {
         digitalWrite(LEFT_INONE, HIGH);
@@ -26,12 +26,12 @@ void MotorController::update(int16_t left, int16_t right) {
     }
 
     if(right > 0) {
-        digitalWrite(RIGHT_INONE, HIGH);
-        digitalWrite(RIGHT_INTWO, LOW);
-        analogWrite(RIGHT_PWM, abs(right));
-    } else if(right < 0) {
         digitalWrite(RIGHT_INONE, LOW);
         digitalWrite(RIGHT_INTWO, HIGH);
+        analogWrite(RIGHT_PWM, abs(right));
+    } else if(right < 0) {
+        digitalWrite(RIGHT_INONE, HIGH);
+        digitalWrite(RIGHT_INTWO, LOW);
         analogWrite(RIGHT_PWM, abs(right));
     } else {
         digitalWrite(RIGHT_INONE, HIGH);
