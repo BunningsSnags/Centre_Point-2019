@@ -15,27 +15,6 @@ void lrfPrint() {
     Serial.println("Front-Left, ");
 }
 
-// void tileTime(int speed) {
-//     tiletime = TILE_SIZE/speed;
-//     tiletime = tiletime * 1000;
-//     return tiletime;
-// }
-// void tileMove(int direction) {
-//     if(direction == 1) {
-//         motors.update(100, 100);
-//         delay(tileTime(100));
-//     } else if(direction == 2) {
-//         motors.update(-100, -100);
-//         delay(tileTime(-100));
-//     } else if(direction == 3) {
-//         motors.update(-100, 100);
-//         //Function for imu degrees(TILE_TURN_DEG)
-//     } else if(direction == 4) {
-//         motors.update(100, -100);
-//         //Function for imu degrees(TILE_TURN_DEG)
-//     }
-// }
-
 void tileMove(int direction) {
     if(direction == 1) {
         motors.update(100, 100);
