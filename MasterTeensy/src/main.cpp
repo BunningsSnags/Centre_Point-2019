@@ -5,6 +5,7 @@ MotorController motors;
 LRFs lrfs;
 
 int speed = 0;
+int tiletime = 0;
 
 void lrfPrint() {
     for(int i = 0; i < LRF_NUM; i++) {
@@ -14,28 +15,40 @@ void lrfPrint() {
     Serial.println("Front-Left, ");
 }
 
-void tileTime(int speed) {
-    int time = TILE_SIZE/speed;
-    int time = time * 1000;
-    return time
-}
+// void tileTime(int speed) {
+//     tiletime = TILE_SIZE/speed;
+//     tiletime = tiletime * 1000;
+//     return tiletime;
+// }
+// void tileMove(int direction) {
+//     if(direction == 1) {
+//         motors.update(100, 100);
+//         delay(tileTime(100));
+//     } else if(direction == 2) {
+//         motors.update(-100, -100);
+//         delay(tileTime(-100));
+//     } else if(direction == 3) {
+//         motors.update(-100, 100);
+//         //Function for imu degrees(TILE_TURN_DEG)
+//     } else if(direction == 4) {
+//         motors.update(100, -100);
+//         //Function for imu degrees(TILE_TURN_DEG)
+//     }
+// }
 
 void tileMove(int direction) {
     if(direction == 1) {
         motors.update(100, 100);
-        delay(tileTime(100));
+        delay(TILE_DIST_TIME);
     } else if(direction == 2) {
         motors.update(-100, -100);
-        delay(tileTime(-100));
+        delay(TILE_DIST_TIME);
     } else if(direction == 3) {
         motors.update(-100, 100);
         //Function for imu degrees(TILE_TURN_DEG)
     } else if(direction == 4) {
         motors.update(100, -100);
         //Function for imu degrees(TILE_TURN_DEG)
-    } else {
-        Serial.println('Unknown direction, please use:');
-        Serial.println('"forward", "back", "left" or "right"');
     }
 }
 
