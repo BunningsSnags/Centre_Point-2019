@@ -12,7 +12,7 @@ void lrfPrint() {
         Serial.print(lrfs.value[i]);
         Serial.print("\t");
     }
-    Serial.println("Front-Left, ");
+    Serial.println("Front-Left, Front-Right, Left-Front, Right-Front, Left-Back, Right-Back, Back-Left, Back-Right");
 }
 
 void tileMove(int direction) {
