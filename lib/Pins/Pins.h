@@ -9,6 +9,10 @@
 #define RIGHT_INONE 27
 #define RIGHT_INTWO 26
 
+// Light Sensor
+#define FRONT_LEFT_LIGHT A0
+#define FRONT_RIGHT_LIGHT A1
+#define BACK_LIGHT A2
 
 // LED Pins
 #define TEENSY_LED 13

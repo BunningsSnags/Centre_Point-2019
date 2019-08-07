@@ -1,27 +1,15 @@
 #include <MotorController.h>
 #include <LRFs.h>
-#include <MPU.h>
+#include <lightSensor.h>
 
 MotorController motors;
 LRFs lrfs;
-MPU imu;
 LightSensor light;
 
 int speed = 0;
 int tiletime = 0;
 
 // ============ Debugers ============
-void debuger(char debug) {
-    if(debug == 'lrf') {
-        lrfPrint();
-    }
-    if(debug == 'imu') {
-        imuPrint();
-    }
-    if(debug == 'light') {
-        lightPrint();
-    }
-}
 // LRF
 void lrfPrint() {
     for(int i = 0; i < LRF_NUM; i++) {
@@ -32,13 +20,18 @@ void lrfPrint() {
 }
 // Light Sensor
 void lightPrint() {
-    for i in LIGHTSENSOR_NUM {
-        Serial.println(value[i]);
+    for(int i = 0; i < LIGHTSENSOR_NUM; i++) {
+        Serial.println(light.light[i]);
     }
 }
-// IMU
-void imuPrint() {
-    MPU::readGyroscope()
+
+void debuger(char debug) {
+    if(debug == 'lrf') {
+        lrfPrint();
+    }
+    if(debug == 'light') {
+        lightPrint();
+    }
 }
 
 void tileMove(int direction) {
@@ -60,14 +53,15 @@ void tileMove(int direction) {
 void setup() {
     motors.init();
     lrfs.init();
+    light.init();
 }
 
 void loop() {
     // Debuging
     while(true) {
-        bebuger(lrf);
+        // debuger(lrf);
         lrfs.update();
-        imu.update();
+        light.update();
     }
     while(lrfs.value[0] > 200) {
         motors.update(100, 100);
