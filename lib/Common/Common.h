@@ -14,4 +14,8 @@
 #define TILE_TURN_TIME
 #define TILE_TURN_DEG
 
+// Light Sensor
+#define LIGHTSENSOR_NUM 3
+#define LIGHT_VALUE_START 0
+
 #endif
