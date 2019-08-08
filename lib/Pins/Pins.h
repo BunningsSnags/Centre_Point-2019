@@ -16,6 +16,7 @@
 
 // LED Pins
 #define TEENSY_LED 13
+#define RGB_LED 23
 
 
 #endif // PINS_H_

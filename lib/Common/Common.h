@@ -10,7 +10,7 @@
 
 // Tile Spacing
 #define TILE_SIZE 300
-#define TILE_DIST_TIME 3000
+#define TILE_DIST_TIME 1550
 #define TILE_TURN_TIME
 #define TILE_TURN_DEG
 
