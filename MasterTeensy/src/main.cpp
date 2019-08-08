@@ -1,10 +1,12 @@
 #include <MotorController.h>
 #include <LRFs.h>
 #include <lightSensor.h>
+#include <LEDs.h>
 
 MotorController motors;
 LRFs lrfs;
 LightSensor light;
+LEDs leds;
 
 int moving = 1;
 
