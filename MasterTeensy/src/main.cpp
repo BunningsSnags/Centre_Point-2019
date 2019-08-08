@@ -6,8 +6,7 @@ MotorController motors;
 LRFs lrfs;
 LightSensor light;
 
-int speed = 0;
-int tiletime = 0;
+int moving = 1;
 
 // ============ Debugers ============
 // LRF
@@ -24,20 +23,24 @@ void lightPrint() {
         Serial.println(light.light[i]);
     }
 }
-
-void debuger(char debug) {
-    if(debug == 'lrf') {
+// Debuging function
+void debuger(int debug) {
+    if(debug == 1) {
         lrfPrint();
     }
-    if(debug == 'light') {
+    if(debug == 2) {
         lightPrint();
     }
 }
 
 void tileMove(int direction) {
     if(direction == 1) {
-        motors.update(100, 100);
-        delay(TILE_DIST_TIME);
+        // moving = true;
+        while(moving == 1) {
+            motors.update(100, 100);
+            delay(TILE_DIST_TIME);
+            moving = 0;
+        }
     } else if(direction == 2) {
         motors.update(-100, -100);
         delay(TILE_DIST_TIME);
@@ -57,14 +60,26 @@ void setup() {
 }
 
 void loop() {
+    lrfs.update();
+    debuger(1);
     // Debuging
-    while(true) {
-        // debuger(lrf);
+    // while(true) {
+    //     debuger(1);
+    //     lrfs.update();
+    //     light.update();
+    // }
+    while(lrfs.value[0] > 150) {
+        debuger(1);
         lrfs.update();
-        light.update();
-    }
-    while(lrfs.value[0] > 200) {
         motors.update(100, 100);
     }
-    motors.update(-150, 150);
+    if(lrfs.value[2] > 100) {
+        motors.update(-100, 100);
+    }
+    if(lrfs.value[3] > 100) {
+        motors.update(100, -100);
+    } 
+    if(lrfs.value[3] < 100 && lrfs.value[2] < 100) {
+        motors.update(-100, 100);   
+    }
 }
