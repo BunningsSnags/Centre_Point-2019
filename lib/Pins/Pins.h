@@ -9,6 +9,13 @@
 #define RIGHT_INONE 27
 #define RIGHT_INTWO 26
 
+// Stepper
+#define PWM 
+#define INONE
+#define INTWO
+#define INTHREE
+#define INFOUR
+
 // Light Sensor
 #define FRONT_LEFT_LIGHT A0
 #define FRONT_RIGHT_LIGHT A1
@@ -16,7 +23,7 @@
 
 // LED Pins
 #define TEENSY_LED 13
-#define RGB_LED 23
+#define RGB_LED 17
 
 
 #endif // PINS_H_

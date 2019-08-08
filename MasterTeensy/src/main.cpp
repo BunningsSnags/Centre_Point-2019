@@ -1,14 +1,70 @@
-#include <MotorController.h>
+// ============ Includes ============
 #include <LRFs.h>
-#include <lightSensor.h>
-#include <LEDs.h>
+#include <MotorController.h>
+#include <MPU.h>
+#include <ThermalSensor.h>
+#include <Timer.h>
+// #include <LEDs.h>
+#include <LightSensor.h>
+#include <Arduino.h>
 
-MotorController motors;
+// ============ Setups ============
 LRFs lrfs;
+MotorController motors;
+MPU imu;
+ThermalSensor thermals;
 LightSensor light;
-LEDs leds;
+// ------------ Timers ------------
+Timer cubeTimer(80000);
+Timer turnTimer(1000000);
+Timer LEDTimer(800000);
+bool ledOn = false;
 
-int moving = 1;
+    // ------------ Main Flash ------------
+void teensyFlash() {
+    if(LEDTimer.timeHasPassed()){
+        digitalWrite(TEENSY_LED, ledOn);
+        ledOn = !ledOn;
+    }
+}
+
+// ============ algorithms ============
+
+
+// ============ Slave Teensy ============
+void receive() {
+    if(Serial1.available() >= SLAVE_PACKET_SIZE) {
+        uint8_t firstByte = Serial1.read();
+        uint8_t secondByte = Serial1.peek();
+        if(firstByte == SLAVE_START_BYTE && secondByte == SLAVE_START_BYTE) {
+            uint8_t buffer[SLAVE_PACKET_SIZE - 2];
+            for(uint8_t i = 0; i < SLAVE_PACKET_SIZE - 2; i++) {
+                buffer[i] = Serial1.read();
+            }
+            lrfs.value[4] = buffer[0] << 8 | buffer[1];
+            lrfs.value[5] = buffer[2] << 8 | buffer[3];
+            lrfs.value[6] = buffer[4] << 8 | buffer[5];
+            lrfs.value[7] = buffer[6] << 8 | buffer[7];
+            thermals.victim[2] = buffer[8] == 0 ? false : true;
+            thermals.victim[3] = buffer[9] == 0 ? false : true;
+        }
+    }
+}
+
+// ============ Setup ============
+void setup() {
+    #if DEBUG
+        Serial.begin(TEENSY_BAUD_RATE);
+    #endif
+    Serial1.begin(TEENSY_BAUD_RATE);
+    lrfs.init();
+    motors.init();
+    imu.init();
+    thermals.init();
+    pinMode(TEENSY_LED, OUTPUT);
+    digitalWrite(TEENSY_LED, HIGH);
+    digitalWrite(TEENSY_LED, LOW);
+}
 
 // ============ Debugers ============
 // LRF
@@ -35,53 +91,43 @@ void debuger(int debug) {
     }
 }
 
-void tileMove(int direction) {
-    if(direction == 1) {
-        // moving = true;
-        while(moving == 1) {
-            motors.update(100, 100);
-            delay(TILE_DIST_TIME);
-            moving = 0;
-        }
-    } else if(direction == 2) {
-        motors.update(-100, -100);
-        delay(TILE_DIST_TIME);
-    } else if(direction == 3) {
-        motors.update(-100, 100);
-        //Function for imu degrees(TILE_TURN_DEG)
-    } else if(direction == 4) {
-        motors.update(100, -100);
-        //Function for imu degrees(TILE_TURN_DEG)
-    }
-}
+// Tile Move
+// void tileMove(int direction) {
+//     if(direction == 1) {
+//         // moving = true;
+//         while(moving == 1) {
+//             tileMove = {
+//                 motors.update(100, 100);
+//                 delay(TILE_DIST_TIME);
+//             }
+//             moving = 0;
+//         }
+//         return tileMove;
+//     }
+// }
 
-void setup() {
-    motors.init();
-    lrfs.init();
-    light.init();
-}
+
 
 void loop() {
+    // ------------ updates ------------
     lrfs.update();
+    thermals.update();
+    light.update();
     debuger(1);
-    // Debuging
-    // while(true) {
+    teensyFlash();
+    // tileMove(1)
+    // while(lrfs.value[0] > 150 && lrfs.value[1] > 150) {
     //     debuger(1);
     //     lrfs.update();
-    //     light.update();
+    //     motors.update(-50, -50);
     // }
-    while(lrfs.value[0] > 150) {
-        debuger(1);
-        lrfs.update();
-        motors.update(100, 100);
-    }
-    if(lrfs.value[2] > 100) {
-        motors.update(-100, 100);
-    }
-    if(lrfs.value[3] > 100) {
-        motors.update(100, -100);
-    } 
-    if(lrfs.value[3] < 100 && lrfs.value[2] < 100) {
-        motors.update(-100, 100);   
-    }
+    // if(lrfs.value[2] > 200) {
+    //     motors.update(-75, 75);
+    // }
+    // if(lrfs.value[3] > 200) {
+    //     motors.update(75, -75);
+    // }
+    // if(lrfs.value[2] < 200 && lrfs.value[3] < 200) {
+    //     motors.update(75, -75);
+    // }
 }
