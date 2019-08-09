@@ -3,7 +3,7 @@ set input=%1
 if %input% == master (
   echo Building Master
   cd MasterTeensy
-  py -m platformio run -t upload
+  py -m platformio run
   cd ..
 )
 if %input% == slave (
