@@ -1,16 +1,16 @@
 // ============ Includes ============
 #include <LRFs.h>
 #include <MotorController.h>
-#include <MPU.h>
-#include <ThermalSensor.h>
+// #include <MPU.h>
+// #include <ThermalSensor.h>
 #include <Timer.h>
 #include <LightSensor.h>
 
 // ============ Setups ============
 LRFs lrfs;
 MotorController motors;
-MPU imu;
-ThermalSensor thermals;
+// MPU imu;
+// ThermalSensor thermals;
 LightSensor light;
 // ------------ Timers ------------
 Timer cubeTimer(80000);
@@ -67,23 +67,6 @@ void rgbFlash(int flash) {
 //     }
 // }
 
-// ============ Setup ============
-void setup() {
-    #if DEBUG
-        Serial.begin(TEENSY_BAUD_RATE);
-    #endif
-    Serial1.begin(TEENSY_BAUD_RATE);
-    lrfs.init();
-    motors.init();
-    imu.init();
-    Serial.begin(TEENSY_BAUD_RATE);
-    thermals.begin();
-    thermals.setUnit(TEMP_C);
-    pinMode(MASTER_LED, OUTPUT);
-    digitalWrite(MASTER_LED, HIGH);
-    digitalWrite(MASTER_LED, LOW);
-}
-
 // ============ Debugers ============
 // LRF
 void lrfPrint() {
@@ -124,6 +107,22 @@ void debuger(int debug) {
 //     }
 // }
 
+// ============ Setup ============
+void setup() {
+    #if DEBUG
+        Serial.begin(TEENSY_BAUD_RATE);
+    #endif
+    Serial1.begin(TEENSY_BAUD_RATE);
+    lrfs.init();
+    motors.init();
+    imu.init();
+    Serial.begin(TEENSY_BAUD_RATE);
+    thermals.begin();
+    thermals.setUnit(TEMP_C);
+    pinMode(MASTER_LED, OUTPUT);
+    digitalWrite(MASTER_LED, HIGH);
+    digitalWrite(MASTER_LED, LOW);
+}
 
 
 void loop() {
