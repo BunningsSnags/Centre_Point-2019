@@ -1,8 +1,16 @@
 #include <LRFs.h>
-#include <ThermalSensor.h>
+#include <Timer.h>
 
 LRFs lrfs;
-ThermalSensor thermals;
+Timer ledTimer(SLAVE_BLINK);
+
+bool ledOn = true;
+void slaveFlash() {
+    if(ledTimer.timeHasPassed()){
+        digitalWrite(SLAVE_LED, ledOn);
+        ledOn = !ledOn;
+    }
+}
 
 void send() {
     Serial1.write(SLAVE_START_BYTE);
@@ -15,8 +23,6 @@ void send() {
     Serial1.write(lowByte(lrfs.value[2]));
     Serial1.write(highByte(lrfs.value[3]));
     Serial1.write(lowByte(lrfs.value[3]));
-    Serial1.write(thermals.victim[0]);
-    Serial1.write(thermals.victim[1]);
 }
 
 void setup() {
@@ -25,11 +31,10 @@ void setup() {
     #endif
     Serial1.begin(TEENSY_BAUD_RATE);
     lrfs.init();
-    thermals.init();
 }
 
 void loop() {
     lrfs.update();
-    thermals.update();
-    digitalWrite(TEENSY_LED, HIGH);
+    slaveFlash();
+    send();
 }
