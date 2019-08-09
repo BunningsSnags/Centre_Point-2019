@@ -17,9 +17,9 @@ Timer cubeTimer(80000);
 Timer turnTimer(1000000);
 Timer ledTimer(800000);
 bool ledOn = false;
-void teensyFlash() {
+void masterFlash() {
     if(ledTimer.timeHasPassed()){
-        digitalWrite(TEENSY_LED, ledOn);
+        digitalWrite(MASTER_LED, ledOn);
         ledOn = !ledOn;
     }
 }
@@ -79,9 +79,9 @@ void setup() {
     Serial.begin(TEENSY_BAUD_RATE);
     thermals.begin();
     thermals.setUnit(TEMP_C);
-    pinMode(TEENSY_LED, OUTPUT);
-    digitalWrite(TEENSY_LED, HIGH);
-    digitalWrite(TEENSY_LED, LOW);
+    pinMode(MASTER_LED, OUTPUT);
+    digitalWrite(MASTER_LED, HIGH);
+    digitalWrite(MASTER_LED, LOW);
 }
 
 // ============ Debugers ============
@@ -131,21 +131,5 @@ void loop() {
     lrfs.update();
     light.update();
     debuger(1);
-    teensyFlash();
-
-    // tileMove(1)
-    // while(lrfs.value[0] > 150 && lrfs.value[1] > 150) {
-    //     debuger(1);
-    //     lrfs.update();
-    //     motors.update(-50, -50);
-    // }
-    // if(lrfs.value[2] > 200) {
-    //     motors.update(-75, 75);
-    // }
-    // if(lrfs.value[3] > 200) {
-    //     motors.update(75, -75);
-    // }
-    // if(lrfs.value[2] < 200 && lrfs.value[3] < 200) {
-    //     motors.update(75, -75);
-    // }
+    masterFlash();
 }
