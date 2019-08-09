@@ -4,9 +4,7 @@
 #include <MPU.h>
 #include <ThermalSensor.h>
 #include <Timer.h>
-// #include <LEDs.h>
 #include <LightSensor.h>
-#include <Arduino.h>
 
 // ============ Setups ============
 LRFs lrfs;
@@ -17,14 +15,32 @@ LightSensor light;
 // ------------ Timers ------------
 Timer cubeTimer(80000);
 Timer turnTimer(1000000);
-Timer LEDTimer(800000);
+Timer ledTimer(800000);
 bool ledOn = false;
-
-    // ------------ Main Flash ------------
 void teensyFlash() {
-    if(LEDTimer.timeHasPassed()){
+    if(ledTimer.timeHasPassed()){
         digitalWrite(TEENSY_LED, ledOn);
         ledOn = !ledOn;
+    }
+}
+void rgbFlash(int flash) {
+    if(flash == 1) {
+        if(cubeTimer.timeHasPassed()){
+            // for(int i = 1; i < leds[NUM_LEDS]; i++) {
+            //     led[i] = CRGB(GREEN);
+            // }
+            // FastLED.show();
+            ledOn = !ledOn;
+        }
+    }
+    if(flash == 2) {
+        if(cubeTimer.timeHasPassed()){
+            // for(int i = 1; i < leds[NUM_LEDS]; i++) {
+            //     led[i] = CRGB(CYAN);
+            // }
+            // FastLED.show();
+            ledOn = !ledOn;
+        }
     }
 }
 
@@ -32,24 +48,24 @@ void teensyFlash() {
 
 
 // ============ Slave Teensy ============
-void receive() {
-    if(Serial1.available() >= SLAVE_PACKET_SIZE) {
-        uint8_t firstByte = Serial1.read();
-        uint8_t secondByte = Serial1.peek();
-        if(firstByte == SLAVE_START_BYTE && secondByte == SLAVE_START_BYTE) {
-            uint8_t buffer[SLAVE_PACKET_SIZE - 2];
-            for(uint8_t i = 0; i < SLAVE_PACKET_SIZE - 2; i++) {
-                buffer[i] = Serial1.read();
-            }
-            lrfs.value[4] = buffer[0] << 8 | buffer[1];
-            lrfs.value[5] = buffer[2] << 8 | buffer[3];
-            lrfs.value[6] = buffer[4] << 8 | buffer[5];
-            lrfs.value[7] = buffer[6] << 8 | buffer[7];
-            thermals.victim[2] = buffer[8] == 0 ? false : true;
-            thermals.victim[3] = buffer[9] == 0 ? false : true;
-        }
-    }
-}
+// void receive() {
+//     if(Serial1.available() >= SLAVE_PACKET_SIZE) {
+//         uint8_t firstByte = Serial1.read();
+//         uint8_t secondByte = Serial1.peek();
+//         if(firstByte == SLAVE_START_BYTE && secondByte == SLAVE_START_BYTE) {
+//             uint8_t buffer[SLAVE_PACKET_SIZE - 2];
+//             for(uint8_t i = 0; i < SLAVE_PACKET_SIZE - 2; i++) {
+//                 buffer[i] = Serial1.read();
+//             }
+//             lrfs.value[4] = buffer[0] << 8 | buffer[1];
+//             lrfs.value[5] = buffer[2] << 8 | buffer[3];
+//             lrfs.value[6] = buffer[4] << 8 | buffer[5];
+//             lrfs.value[7] = buffer[6] << 8 | buffer[7];
+//             thermals.victim[2] = buffer[8] == 0 ? false : true;
+//             thermals.victim[3] = buffer[9] == 0 ? false : true;
+//         }
+//     }
+// }
 
 // ============ Setup ============
 void setup() {
@@ -60,7 +76,9 @@ void setup() {
     lrfs.init();
     motors.init();
     imu.init();
-    thermals.init();
+    Serial.begin(TEENSY_BAUD_RATE);
+    thermals.begin();
+    thermals.setUnit(TEMP_C);
     pinMode(TEENSY_LED, OUTPUT);
     digitalWrite(TEENSY_LED, HIGH);
     digitalWrite(TEENSY_LED, LOW);
@@ -111,10 +129,10 @@ void debuger(int debug) {
 void loop() {
     // ------------ updates ------------
     lrfs.update();
-    thermals.update();
     light.update();
     debuger(1);
     teensyFlash();
+
     // tileMove(1)
     // while(lrfs.value[0] > 150 && lrfs.value[1] > 150) {
     //     debuger(1);

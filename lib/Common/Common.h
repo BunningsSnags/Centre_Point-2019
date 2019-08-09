@@ -54,6 +54,11 @@
 #define LIGHTSENSOR_NUM 3
 #define LIGHT_VALUE_START 0
 
+
+// RGB Leds
+#define NUM_LEDS 5
+#define DATA_PIN 23
+
 struct Coordinate {
     int8_t x;
     int8_t y;
