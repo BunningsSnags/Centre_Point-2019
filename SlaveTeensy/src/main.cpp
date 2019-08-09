@@ -31,4 +31,5 @@ void setup() {
 void loop() {
     lrfs.update();
     thermals.update();
+    digitalWrite(TEENSY_LED, HIGH);
 }
