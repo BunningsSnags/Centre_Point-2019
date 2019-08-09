@@ -5,11 +5,11 @@ Timer::Timer(unsigned long duration) {
 }
 
 void Timer::update() {
-    lastUpdate = micros();
+    lastUpdate = millis();
 }
 
 bool Timer::timeHasPassed() {
-    if (micros() - lastUpdate > timerDuration) {
+    if (millis() - lastUpdate > timerDuration) {
         update();
         return true;
     }
@@ -18,9 +18,9 @@ bool Timer::timeHasPassed() {
 }
 
 bool Timer::timeHasPassedNoUpdate() {
-    return micros() - lastUpdate > timerDuration;
+    return millis() - lastUpdate > timerDuration;
 }
 
 void Timer::resetTime() {
-    lastUpdate = micros();
+    lastUpdate = millis();
 }

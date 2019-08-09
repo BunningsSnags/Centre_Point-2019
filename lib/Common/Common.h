@@ -8,6 +8,8 @@
 // Debug
 #define DEBUG false
 #define TEENSY_BAUD_RATE 9600
+#define MASTER_BLINK 1000
+#define SLAVE_BLINK 500
 
 
 // Communications

@@ -22,7 +22,8 @@
 #define BACK_LIGHT A2
 
 // LED Pins
-#define TEENSY_LED 13
+#define MASTER_LED 13
+#define SLAVE_LED 13
 #define RGB_LED 17
 
 
