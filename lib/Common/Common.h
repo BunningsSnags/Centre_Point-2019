@@ -13,7 +13,7 @@
 
 
 // Communications
-#define SLAVE_PACKET_SIZE 12
+#define SLAVE_PACKET_SIZE 10
 #define SLAVE_START_BYTE 255
 
 

@@ -31,6 +31,7 @@ void setup() {
     #endif
     Serial1.begin(TEENSY_BAUD_RATE);
     lrfs.init();
+    pinMode(SLAVE_LED, OUTPUT);
 }
 
 void loop() {
