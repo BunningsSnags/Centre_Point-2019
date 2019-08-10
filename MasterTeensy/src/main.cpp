@@ -3,11 +3,18 @@
 #include <MotorController.h>
 #include <Timer.h>
 #include <LightSensor.h>
+#include <i2c_t3.h>
+#include <ThermalSensor_Bus1.h>
+#include <ThermalSensor_Bus2.h>
+#include <Adafruit_NeoPixel.h>
 
 // ============ Setups ============
 LRFs lrfs;
+ThermalSensor_Bus1 thermFront;
+ThermalSensor_Bus2 thermLeft;
 MotorController motors;
 LightSensor light;
+Adafruit_NeoPixel strip(5, 23, NEO_GRB + NEO_KHZ800);
 // ------------ Timers ------------
 Timer ledTimer(MASTER_BLINK);
 bool ledOn = false;
@@ -55,6 +62,15 @@ void lightPrint() {
         Serial.println(light.light[i]);
     }
 }
+// Thermal
+void thermalPrint() {
+    if(thermFront.read()) {
+        Serial.println(String(thermFront.object(), 2));
+    }
+    if(thermLeft.read()) {
+        Serial.println(String(thermLeft.object(), 2));
+    }
+}
 // Debuging function
 void debuger(int debug) {
     if(debug == 1) {
@@ -62,6 +78,9 @@ void debuger(int debug) {
     }
     if(debug == 2) {
         lightPrint();
+    }
+    if(debug == 3) {
+        thermalPrint();
     }
 }
 
@@ -90,6 +109,14 @@ void setup() {
     light.init();
     motors.init();
     pinMode(MASTER_LED, OUTPUT);
+    Serial.begin(9600);
+    thermFront.begin();
+    thermFront.setUnit(TEMP_C);
+    thermLeft.begin();
+    thermLeft.setUnit(TEMP_C);
+    strip.begin();
+    strip.clear();
+    strip.show();
 }
 
 
@@ -98,23 +125,35 @@ void loop() {
     receive();
     lrfs.update();
     light.update();
-    debuger(1);
+    debuger(3);
     masterFlash();
-    // while(light.light[3] < 500) {
-        while(lrfs.value[0] > 200 && lrfs.value[1] > 200) {
+    thermFront.read();
+    while(thermFront.object() <= 25) {
+        debuger(3);
+        thermFront.read();
+        lrfs.update();
+        while(lrfs.value[0] > 100) {
+            thermFront.read();
             masterFlash();
-            debuger(1);
-            motors.update(100, 100);
+            lrfs.update();
+            debuger(3);
+            motors.update(75, 75);
         }
-        if(lrfs.value[3] > lrfs.value[4]) {
+        motors.update(-75, -75);
+        delay(500);
+        if(lrfs.value[2] > 150) {
             motors.update(-100, 100);
         }
-        if(lrfs.value[4] > lrfs.value[3]) {
+        if(lrfs.value[3] > 150) {
             motors.update(100, -100);
         }
-    // }
-    // motors.update(100, 100);
-    // delay(1000);
-    // motors.update(100, -100);
-    // delay(3000);
+    }
+    motors.update(0, 0);
+    for(int i = 0; i < 5; i++) {
+        strip.setPixelColor(i, strip.Color(225, 0, 0));
+    }
+    // strip.show();
+    // delay(5000);
+    // strip.clear();
+    // strip.show();
 }
