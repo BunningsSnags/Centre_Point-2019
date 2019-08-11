@@ -7,14 +7,19 @@
 #include <ThermalSensor_Bus1.h>
 #include <ThermalSensor_Bus2.h>
 #include <Adafruit_NeoPixel.h>
+#include <SPI.h>
+#include <Adafruit_NeoPixel.h>
+#ifdef __AVR__
+  #include <avr/power.h>
+#endif
 
 // ============ Setups ============
 LRFs lrfs;
 ThermalSensor_Bus1 thermFront;
-ThermalSensor_Bus2 thermLeft;
+// ThermalSensor_Bus2 thermLeft;
 MotorController motors;
 LightSensor light;
-Adafruit_NeoPixel strip(5, 23, NEO_GRB + NEO_KHZ800);
+Adafruit_NeoPixel strip(NUM_RGB_LEDS, 38, NEO_GRB + NEO_KHZ800);
 // ------------ Timers ------------
 Timer ledTimer(MASTER_BLINK);
 bool ledOn = false;
@@ -25,7 +30,45 @@ void masterFlash() {
     }
 }
 
-// ============ algorithms ============
+// ============ Debugers ============
+// LRF
+void lrfsPrint() {
+    for(int i = 0; i < LRF_NUM; i++) {
+        Serial.print(lrfs.value[i]);
+        Serial.print("\t");
+    }
+    Serial.println("Front-Left, Front-Right, Left-Front, Right-Front, Left-Back, Right-Back, Back-Left, Back-Right");
+}
+// Light Sensor
+void lightPrint() {
+    for(int i = 0; i < LIGHTSENSOR_NUM; i++) {
+        Serial.println(light.light[i]);
+    }
+}
+// Thermal
+void thermalPrint() {
+    if(thermFront.read()) {
+        Serial.println(String(thermFront.object(), 2));
+    }
+//     if(thermLeft.read()) {
+//         Serial.println(String(thermLeft.object(), 2));
+//     }
+}
+// Debuging function
+void debug(int sensor) {
+    if(sensor == 0) {
+        sensor = 0;
+    }
+    if(sensor == 1) {
+        lrfsPrint();
+    }
+    if(sensor == 2) {
+        lightPrint();
+    }
+    if(sensor == 3) {
+        thermalPrint();
+    }
+}
 
 
 // ============ Slave Teensy ============
@@ -47,43 +90,6 @@ void receive() {
     }
 }
 
-// ============ Debugers ============
-// LRF
-void lrfPrint() {
-    for(int i = 0; i < LRF_NUM; i++) {
-        Serial.print(lrfs.value[i]);
-        Serial.print("\t");
-    }
-    Serial.println("Front-Left, Front-Right, Left-Front, Right-Front, Left-Back, Right-Back, Back-Left, Back-Right");
-}
-// Light Sensor
-void lightPrint() {
-    for(int i = 0; i < LIGHTSENSOR_NUM; i++) {
-        Serial.println(light.light[i]);
-    }
-}
-// Thermal
-void thermalPrint() {
-    if(thermFront.read()) {
-        Serial.println(String(thermFront.object(), 2));
-    }
-    if(thermLeft.read()) {
-        Serial.println(String(thermLeft.object(), 2));
-    }
-}
-// Debuging function
-void debuger(int debug) {
-    if(debug == 1) {
-        lrfPrint();
-    }
-    if(debug == 2) {
-        lightPrint();
-    }
-    if(debug == 3) {
-        thermalPrint();
-    }
-}
-
 // Tile Move
 // void tileMove(int direction) {
 //     if(direction == 1) {
@@ -99,6 +105,91 @@ void debuger(int debug) {
 //     }
 // }
 
+// Lights
+// Input a value 0 to 255 to get a color value.
+// The colours are a transition r - g - b - back to r.
+uint32_t Wheel(byte WheelPos) {
+  WheelPos = 255 - WheelPos;
+  if(WheelPos < 85) {
+    return strip.Color(255 - WheelPos * 3, 0, WheelPos * 3);
+  }
+  if(WheelPos < 170) {
+    WheelPos -= 85;
+    return strip.Color(0, WheelPos * 3, 255 - WheelPos * 3);
+  }
+  WheelPos -= 170;
+  return strip.Color(WheelPos * 3, 255 - WheelPos * 3, 0);
+}
+
+void colorWipe(uint32_t c, uint8_t wait) {
+  for(uint16_t i=0; i<strip.numPixels(); i++) {
+    strip.setPixelColor(i, c);
+    strip.show();
+    delay(wait);
+  }
+}
+
+void rainbow(uint8_t wait) {
+  uint16_t i, j;
+
+  for(j=0; j<256; j++) {
+    for(i=0; i<strip.numPixels(); i++) {
+      strip.setPixelColor(i, Wheel((i+j) & 255));
+    }
+    strip.show();
+    delay(wait);
+  }
+}
+
+// Slightly different, this makes the rainbow equally distributed throughout
+void rainbowCycle(uint8_t wait) {
+  uint16_t i, j;
+
+  for(j=0; j<256*5; j++) { // 5 cycles of all colors on wheel
+    for(i=0; i< strip.numPixels(); i++) {
+      strip.setPixelColor(i, Wheel(((i * 256 / strip.numPixels()) + j) & 255));
+    }
+    strip.show();
+    delay(wait);
+  }
+}
+
+//Theatre-style crawling lights.
+void theaterChase(uint32_t c, uint8_t wait) {
+  for (int j=0; j<10; j++) {  //do 10 cycles of chasing
+    for (int q=0; q < 3; q++) {
+      for (uint16_t i=0; i < strip.numPixels(); i=i+3) {
+        strip.setPixelColor(i+q, c);    //turn every third pixel on
+      }
+      strip.show();
+
+      delay(wait);
+
+      for (uint16_t i=0; i < strip.numPixels(); i=i+3) {
+        strip.setPixelColor(i+q, 0);        //turn every third pixel off
+      }
+    }
+  }
+}
+
+//Theatre-style crawling lights with rainbow effect
+void theaterChaseRainbow(uint8_t wait) {
+  for (int j=0; j < 256; j++) {     // cycle all 256 colors in the wheel
+    for (int q=0; q < 3; q++) {
+      for (uint16_t i=0; i < strip.numPixels(); i=i+3) {
+        strip.setPixelColor(i+q, Wheel( (i+j) % 255));    //turn every third pixel on
+      }
+      strip.show();
+
+      delay(wait);
+
+      for (uint16_t i=0; i < strip.numPixels(); i=i+3) {
+        strip.setPixelColor(i+q, 0);        //turn every third pixel off
+      }
+    }
+  }
+}
+
 // ============ Setup ============
 void setup() {
     #if DEBUG
@@ -112,10 +203,13 @@ void setup() {
     Serial.begin(9600);
     thermFront.begin();
     thermFront.setUnit(TEMP_C);
-    thermLeft.begin();
-    thermLeft.setUnit(TEMP_C);
+    // thermLeft.begin();
+    // thermLeft.setUnit(TEMP_C);
+    #if defined (__AVR_ATtiny85__)
+    if (F_CPU == 16000000) clock_prescale_set(clock_div_1);
+    #endif
     strip.begin();
-    strip.clear();
+    strip.setBrightness(10);
     strip.show();
 }
 
@@ -125,35 +219,47 @@ void loop() {
     receive();
     lrfs.update();
     light.update();
-    debuger(3);
+    debug(1);
     masterFlash();
     thermFront.read();
-    while(thermFront.object() <= 25) {
-        debuger(3);
+    // while(thermFront.object() <= 23 /*|| thermLeft.object() <= 25*/) {
+        debug(1);
         thermFront.read();
         lrfs.update();
-        while(lrfs.value[0] > 100) {
+        while(lrfs.value[0] > 150 && lrfs.value[1] > 150) {
+            receive();
             thermFront.read();
             masterFlash();
             lrfs.update();
-            debuger(3);
-            motors.update(75, 75);
+            debug(1);
+            motors.update(200, 200);
+            // if(lrfs.value[2] < 100 && lrfs.value[4] < 100) {
+            //     receive();
+            //     lrfs.update();
+            //     motors.update(200, 150);
+            // }
+            // if(lrfs.value[3] < 100 && lrfs.value[5] < 100) {
+            //     receive();
+            //     lrfs.update();
+            //     motors.update(150, 200);
+            // }
+            // if(lrfs.value[3] < 50 || lrfs.value[5] < 50) {
+            //     lrfs.update();
+            //     motors.update(50, 100);
+            // }
         }
-        motors.update(-75, -75);
-        delay(500);
-        if(lrfs.value[2] > 150) {
-            motors.update(-100, 100);
+        if(lrfs.value[2] > 200) {
+            receive();
+            motors.update(200, -200);
         }
-        if(lrfs.value[3] > 150) {
-            motors.update(100, -100);
+        if(lrfs.value[3] > 200) {
+            receive();
+            motors.update(-200, 200);
         }
-    }
-    motors.update(0, 0);
-    for(int i = 0; i < 5; i++) {
-        strip.setPixelColor(i, strip.Color(225, 0, 0));
-    }
-    // strip.show();
-    // delay(5000);
-    // strip.clear();
-    // strip.show();
+        else {
+           motors.update(-200, 200); 
+        }
+    // }
+    // thermFront.read();
+    // motors.update(0, 0);
 }

@@ -37,8 +37,8 @@
 
 
 // RGB Leds
-#define NUM_LEDS 5
-#define DATA_PIN 23
+#define NUM_RGB_LEDS 16
+#define DATA_PIN 48
 
 struct Coordinate {
     int8_t x;
