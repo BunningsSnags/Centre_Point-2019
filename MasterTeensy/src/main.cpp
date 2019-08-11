@@ -22,7 +22,7 @@ LightSensor light;
 Adafruit_NeoPixel strip(NUM_RGB_LEDS, 38, NEO_GRB + NEO_KHZ800);
 // ------------ Timers ------------
 Timer ledTimer(MASTER_BLINK);
-bool ledOn = false;
+bool ledOn = true;
 void masterFlash() {
     if(ledTimer.timeHasPassed()){
         digitalWrite(MASTER_LED, ledOn);
@@ -89,21 +89,6 @@ void receive() {
         }
     }
 }
-
-// Tile Move
-// void tileMove(int direction) {
-//     if(direction == 1) {
-//         // moving = true;
-//         while(moving == 1) {
-//             tileMove = {
-//                 motors.update(100, 100);
-//                 delay(TILE_DIST_TIME);
-//             }
-//             moving = 0;
-//         }
-//         return tileMove;
-//     }
-// }
 
 // Lights
 // Input a value 0 to 255 to get a color value.
@@ -219,20 +204,21 @@ void loop() {
     receive();
     lrfs.update();
     light.update();
-    debug(1);
+    lrfsPrint();
     masterFlash();
-    thermFront.read();
-    // while(thermFront.object() <= 23 /*|| thermLeft.object() <= 25*/) {
-        debug(1);
-        thermFront.read();
+    // thermFront.read();
+    while(thermFront.object() <= 23 /*|| thermLeft.object() <= 25*/) {;
+        // thermFront.read();
+        lrfsPrint();
         lrfs.update();
-        while(lrfs.value[0] > 150 && lrfs.value[1] > 150) {
+        while(lrfs.value[0] > 130 || lrfs.value[1] > 130) {
             receive();
-            thermFront.read();
+            // colorWipe(strip.Color(255, 0, 0), 10);
+            // thermFront.read();
             masterFlash();
             lrfs.update();
-            debug(1);
-            motors.update(200, 200);
+            lrfsPrint();
+            motors.update(150, 150);
             // if(lrfs.value[2] < 100 && lrfs.value[4] < 100) {
             //     receive();
             //     lrfs.update();
@@ -248,18 +234,19 @@ void loop() {
             //     motors.update(50, 100);
             // }
         }
-        if(lrfs.value[2] > 200) {
+        if((lrfs.value[2] - lrfs.value[3]) > 0) {
             receive();
-            motors.update(200, -200);
-        }
-        if(lrfs.value[3] > 200) {
+            motors.update(150, -150);
+        } else if((lrfs.value[2] - lrfs.value[3]) < 0) {
             receive();
-            motors.update(-200, 200);
+            motors.update(-150, 150);
+        } else {
+           motors.update(-150, 150); 
         }
-        else {
-           motors.update(-200, 200); 
-        }
-    // }
+    }
     // thermFront.read();
-    // motors.update(0, 0);
+    motors.update(0, 0);
+    delay(3000);
+    motors.update(200, 200);
+    delay(3000);
 }
