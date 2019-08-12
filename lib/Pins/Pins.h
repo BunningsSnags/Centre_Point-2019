@@ -11,10 +11,10 @@
 
 // Stepper
 #define PWM 
-#define INONE
-#define INTWO
-#define INTHREE
-#define INFOUR
+#define INONE 5
+#define INTWO 6
+#define INTHREE 11
+#define INFOUR 12
 
 // Light Sensor
 #define FRONT_LEFT_LIGHT A0
