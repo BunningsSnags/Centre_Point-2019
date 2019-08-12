@@ -1,6 +1,8 @@
 #ifndef ADAFRUIT_NEOPIXEL_H
 #define ADAFRUIT_NEOPIXEL_H
 
+#include <Colours.h>
+
 #ifdef ARDUINO
   #if (ARDUINO >= 100)
   #include <Arduino.h>
