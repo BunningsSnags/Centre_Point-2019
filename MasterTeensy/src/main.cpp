@@ -3,9 +3,6 @@
 #include <MotorController.h>
 #include <Timer.h>
 #include <LightSensor.h>
-#include <i2c_t3.h>
-#include <ThermalSensor_Bus1.h>
-#include <ThermalSensor_Bus2.h>
 #include <Adafruit_NeoPixel.h>
 #include <SPI.h>
 #include <Adafruit_NeoPixel.h>
@@ -15,8 +12,6 @@
 
 // ============ Setups ============
 LRFs lrfs;
-ThermalSensor_Bus1 thermFront;
-// ThermalSensor_Bus2 thermLeft;
 MotorController motors;
 LightSensor light;
 Adafruit_NeoPixel strip(NUM_RGB_LEDS, 38, NEO_GRB + NEO_KHZ800);
@@ -47,13 +42,8 @@ void lightPrint() {
 }
 // Thermal
 void thermalPrint() {
-    if(thermFront.read()) {
-        Serial.println(String(thermFront.object(), 2));
+    
     }
-//     if(thermLeft.read()) {
-//         Serial.println(String(thermLeft.object(), 2));
-//     }
-}
 // Debuging function
 void debug(int sensor) {
     if(sensor == 0) {
@@ -186,8 +176,6 @@ void setup() {
     motors.init();
     pinMode(MASTER_LED, OUTPUT);
     Serial.begin(9600);
-    thermFront.begin();
-    thermFront.setUnit(TEMP_C);
     // thermLeft.begin();
     // thermLeft.setUnit(TEMP_C);
     #if defined (__AVR_ATtiny85__)
@@ -201,52 +189,5 @@ void setup() {
 
 void loop() {
     // ------------ updates ------------
-    receive();
-    lrfs.update();
-    light.update();
-    lrfsPrint();
-    masterFlash();
-    // thermFront.read();
-    while(thermFront.object() <= 23 /*|| thermLeft.object() <= 25*/) {;
-        // thermFront.read();
-        lrfsPrint();
-        lrfs.update();
-        while(lrfs.value[0] > 130 || lrfs.value[1] > 130) {
-            receive();
-            // colorWipe(strip.Color(255, 0, 0), 10);
-            // thermFront.read();
-            masterFlash();
-            lrfs.update();
-            lrfsPrint();
-            motors.update(150, 150);
-            // if(lrfs.value[2] < 100 && lrfs.value[4] < 100) {
-            //     receive();
-            //     lrfs.update();
-            //     motors.update(200, 150);
-            // }
-            // if(lrfs.value[3] < 100 && lrfs.value[5] < 100) {
-            //     receive();
-            //     lrfs.update();
-            //     motors.update(150, 200);
-            // }
-            // if(lrfs.value[3] < 50 || lrfs.value[5] < 50) {
-            //     lrfs.update();
-            //     motors.update(50, 100);
-            // }
-        }
-        if((lrfs.value[2] - lrfs.value[3]) > 0) {
-            receive();
-            motors.update(150, -150);
-        } else if((lrfs.value[2] - lrfs.value[3]) < 0) {
-            receive();
-            motors.update(-150, 150);
-        } else {
-           motors.update(-150, 150); 
-        }
-    }
-    // thermFront.read();
-    motors.update(0, 0);
-    delay(3000);
-    motors.update(200, 200);
-    delay(3000);
+    rainbowCycle(10);
 }
