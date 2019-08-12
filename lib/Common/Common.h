@@ -40,6 +40,11 @@
 #define NUM_RGB_LEDS 16
 #define DATA_PIN 48
 
+
+// Stepper
+#define STEPPER_BAUD_RATE 115200
+
+
 struct Coordinate {
     int8_t x;
     int8_t y;
