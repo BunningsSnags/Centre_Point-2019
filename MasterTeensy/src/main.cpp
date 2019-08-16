@@ -60,6 +60,12 @@ void debug(int sensor) {
     }
 }
 
+void tileMove(int direction) {
+    if(direction == 1) {
+
+    }
+}
+
 
 // ============ Slave Teensy ============
 void receive() {
@@ -189,5 +195,27 @@ void setup() {
 
 void loop() {
     // ------------ updates ------------
-    rainbowCycle(10);
+    // rainbowCycle(10);
+    debug(1);
+    lrfs.update();
+    masterFlash();
+    receive();
+    while(lrfs.value[2] > 150) {
+        motors.update(200, 200);
+        debug(1);
+        lrfs.update();
+        masterFlash();
+        receive();
+    }
+    if(lrfs.average(0, 1) < 150) {
+        if(lrfs.value[4] > 150) {
+            motors.update(-200, 200);
+        }
+        else if(lrfs.average(3, 5) > 150) {
+            motors.update(200, -200);
+        }
+        else {
+            motors.update(200, -200);
+        }
+    }
 }
