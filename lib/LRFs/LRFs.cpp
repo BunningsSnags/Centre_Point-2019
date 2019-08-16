@@ -7,9 +7,10 @@ void LRFs::init() {
     Serial5.begin(LRF_BAUD_RATE);
 }
 
-// void LRFs::average(uint16_t lrf1, uint16_t lrf2) {
-//     uint16_t averaged = (value[lrf1] + value[lrf2])/2;
-// }
+uint16_t LRFs::average(int lrf1, int lrf2) {
+    uint16_t averaged = (value[lrf1] + value[lrf2])/2;
+    return averaged;
+}
 
 // HardwareSerial Serial2[] = {Serial2, Serial3, Serial4, Serial5};
 void LRFs::update() {
