@@ -11,6 +11,7 @@ void MotorController::init() {
 }
 
 void MotorController::update(int16_t left, int16_t right) {
+    
     if(left > 0) {
         digitalWrite(LEFT_INONE, HIGH);
         digitalWrite(LEFT_INTWO, LOW);
