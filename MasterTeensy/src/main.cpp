@@ -3,9 +3,10 @@
 #include <MotorController.h>
 #include <Timer.h>
 #include <LightSensor.h>
-#include <Adafruit_NeoPixel.h>
 #include <SPI.h>
 #include <Adafruit_NeoPixel.h>
+#include <MPU.h>
+#include <PID.h>
 #ifdef __AVR__
   #include <avr/power.h>
 #endif
@@ -14,7 +15,9 @@
 LRFs lrfs;
 MotorController motors;
 LightSensor light;
-Adafruit_NeoPixel strip(NUM_RGB_LEDS, 38, NEO_GRB + NEO_KHZ800);
+MPU imu;
+PID pid = PID(10.0, 0.0, 0.0, 2/360);
+Adafruit_NeoPixel strip(NUM_RGB_LEDS, DATA_PIN, NEO_GRB + NEO_KHZ800);
 // ------------ Timers ------------
 Timer ledTimer(MASTER_BLINK);
 bool ledOn = true;
@@ -42,21 +45,28 @@ void lightPrint() {
 }
 // Thermal
 void thermalPrint() {
-    
-    }
+}
+// IMU
+void imuPrint() {
+  Serial.print(imu.horizontalHeading);
+  Serial.print("\t");
+  Serial.print(imu.verticalHeading);
+  Serial.print("\t");
+  Serial.println("Horizontal, Vertical");
+}
 // Debuging function
 void debug(int sensor) {
-    if(sensor == 0) {
-        sensor = 0;
-    }
     if(sensor == 1) {
-        lrfsPrint();
+      lrfsPrint();
     }
     if(sensor == 2) {
-        lightPrint();
+      lightPrint();
     }
     if(sensor == 3) {
-        thermalPrint();
+      thermalPrint();
+    }
+    if(sensor == 4) {
+      imuPrint();
     }
 }
 
@@ -182,40 +192,66 @@ void setup() {
     motors.init();
     pinMode(MASTER_LED, OUTPUT);
     Serial.begin(9600);
+    imu.init();
     // thermLeft.begin();
     // thermLeft.setUnit(TEMP_C);
     #if defined (__AVR_ATtiny85__)
     if (F_CPU == 16000000) clock_prescale_set(clock_div_1);
     #endif
     strip.begin();
-    strip.setBrightness(10);
+    strip.setBrightness(20);
     strip.show();
 }
 
 
 void loop() {
-    // ------------ updates ------------
-    // rainbowCycle(10);
-    debug(1);
+  // ------------ updates ------------
+  // rainbow(10);
+  // debug(4);
+  // imu.update();
+  // lrfs.update();
+  // masterFlash();
+  // receive();
+  // while(lrfs.value[1] > 150) {
+    imu.update();
     lrfs.update();
+    double leftCorrection = -2*pid.update(imu.horizontalHeading, 2.00, 0.00);
+    double rightCorrection = 2*pid.update(imu.horizontalHeading, 358.00, 0.00);
+    motors.update(100, 100);
+    if(leftCorrection < rightCorrection) {
+      motors.update(leftCorrection, -leftCorrection);
+    }
+    else if(rightCorrection < leftCorrection) {
+      motors.update(-rightCorrection, rightCorrection);
+    }
+    else {
+      motors.update(100, 100);
+    }
+    Serial.print(leftCorrection);
+    Serial.print(" ");
+    Serial.print(rightCorrection);
+    Serial.print("\t");
+    Serial.println("Left correction, Right correction");
+    // debug(4);
     masterFlash();
     receive();
-    while(lrfs.value[2] > 150) {
-        motors.update(200, 200);
-        debug(1);
-        lrfs.update();
-        masterFlash();
-        receive();
-    }
-    if(lrfs.average(0, 1) < 150) {
-        if(lrfs.value[4] > 150) {
-            motors.update(-200, 200);
-        }
-        else if(lrfs.average(3, 5) > 150) {
-            motors.update(200, -200);
-        }
-        else {
-            motors.update(200, -200);
-        }
-    }
+  // }
+  // motors.update(0, 0);
+  // if(lrfs.value[3] > 150) {
+  //   if(imu.horizontalHeading != (imu.horizontalHeading - 90)) {
+  //     motors.update(-200, 200);
+  //   }
+  // }
+  // else if(lrfs.value[4] > 150) {
+  //   while(imu.horizontalHeading != (imu.horizontalHeading + 90)) {
+  //     imu.update();
+  //     motors.update(200, -200);
+  //   }
+  // }
+  // else {
+  //   while(imu.horizontalHeading != (imu.horizontalHeading + 180)) {
+  //     imu.update();
+  //     motors.update(200, -200);
+  //   }
+  // }
 }
