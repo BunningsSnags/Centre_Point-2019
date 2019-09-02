@@ -128,7 +128,6 @@
             ],
             "browse": {
                 "limitSymbolsToIncludedHeaders": true,
-                "databaseFilename": "${workspaceRoot}/.vscode/.browse.c_cpp.db",
                 "path": [
                     "c:/Users/25022/OneDrive - Brisbane Boys' College/Robtics/Maze/Code/Centre_Point/include",
                     "C:/Users/25022/.platformio/packages/framework-arduinoteensy/cores/teensy3",
@@ -252,7 +251,7 @@
                 ]
             },
             "defines": [
-                "PLATFORMIO=40000",
+                "PLATFORMIO=40003",
                 "__MK64FX512__",
                 "TEENSY35",
                 "USB_SERIAL",
