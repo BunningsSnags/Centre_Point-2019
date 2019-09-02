@@ -10,8 +10,12 @@ void MotorController::init() {
     pinMode(RIGHT_INTWO, OUTPUT);
 }
 
-void MotorController::update(int16_t left, int16_t right) {
-    
+void MotorController::update(int16_t left, int16_t right, int16_t rotation) {
+
+    left = left - rotation;
+    right = right + rotation;
+
+
     if(left > 0) {
         digitalWrite(LEFT_INONE, HIGH);
         digitalWrite(LEFT_INTWO, LOW);
@@ -38,5 +42,15 @@ void MotorController::update(int16_t left, int16_t right) {
         digitalWrite(RIGHT_INONE, HIGH);
         digitalWrite(RIGHT_INTWO, HIGH);
         analogWrite(RIGHT_PWM, abs(right));
+    }
+}
+
+bool MotorController::setOrientation(int ofSet) {
+    if(fabs(ofSet) < 100) {
+        return true;
+    }
+    else {
+        update(0, 0, ofSet);
+        return false;
     }
 }
