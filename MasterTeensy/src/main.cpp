@@ -217,7 +217,7 @@ void loop() {
   // ------------ updates ------------
   imu.update();
   IMUCorrection = round(IMUPID.update(imu.horizontalHeading, direction, 0));
-  LRFCorrection = round(LRFPID.update(lrfs.value[2, 3, 4, 5], 150, 150));
+  LRFCorrection = round(LRFPID.update(lrfs.value[2, 3, 4, 5], 150, ));
   // Serial.print(IMUCorrection);
   // Serial.print("\t");
   // Serial.println("IMU Correction");
