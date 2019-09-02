@@ -11,14 +11,24 @@ PID::PID(double p, double i, double d, double absoluteMax){
 
 double PID::update(double input, double setpoint, double modulus){
     double derivative;
-    double error = setpoint - input;
+
+    
+    double error = setpoint + input;
+    error = fmod(error, 360);
+    error = error < 0 ? error + 360 : error;
+
+    error = -(error < 180 ? error : -(360 - error));
+    Serial.println(error);
+    
+
+
 
     ulong currentTime = micros();
     double elapsedTime = (currentTime - lastTime) / 1000000.0;
     lastTime = currentTime;
     integral += elapsedTime * error;
     if(modulus != 0.0) {
-        double difference = (input - lastInput);
+        double difference = (error - error);
         if(difference < -modulus) {
             difference += modulus;
         }else if(difference > modulus) {
@@ -26,9 +36,9 @@ double PID::update(double input, double setpoint, double modulus){
         }
         derivative = difference / elapsedTime;
     }else {
-        derivative = (input - lastInput) / elapsedTime;
+        derivative = (error - lastInput) / elapsedTime;
     }
-    lastInput = input;
+    lastInput = error;
     double correction = kp * error + ki * integral - kd * derivative;
     return absMax == 0 ? correction : constrain(correction, -absMax, absMax);
 }

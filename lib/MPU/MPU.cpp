@@ -35,6 +35,7 @@ void MPU::update() {
     }
 	horizontalHeading = floatMod(horizontalHeading, 360);
     verticalHeading = floatMod(verticalHeading, 360);
+    delay(10);
 }
 
 void MPU::calibrate() {
