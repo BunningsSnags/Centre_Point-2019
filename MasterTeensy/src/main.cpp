@@ -16,8 +16,15 @@ LRFs lrfs;
 MotorController motors;
 LightSensor light;
 MPU imu;
-PID pid = PID(10.0, 0.0, 0.0, 2/360);
+PID IMUPID = PID(10, 0, 0, 255);
+PID LRFPID = PID(10, 0, 0, 255);
+// PID turnPID = PID(10.0, 0.0, 0.0);
 Adafruit_NeoPixel strip(NUM_RGB_LEDS, DATA_PIN, NEO_GRB + NEO_KHZ800);
+int direction = 0;
+
+double IMUCorrection;
+
+
 // ------------ Timers ------------
 Timer ledTimer(MASTER_BLINK);
 bool ledOn = true;
@@ -54,28 +61,29 @@ void imuPrint() {
   Serial.print("\t");
   Serial.println("Horizontal, Vertical");
 }
+void wallCorrectionPrint() {
+  Serial.print(IMUCorrection);
+  Serial.print("\t");
+  Serial.println("IMU Correction");
+}
 // Debuging function
 void debug(int sensor) {
-    if(sensor == 1) {
-      lrfsPrint();
-    }
-    if(sensor == 2) {
-      lightPrint();
-    }
-    if(sensor == 3) {
-      thermalPrint();
-    }
-    if(sensor == 4) {
-      imuPrint();
-    }
+  if(sensor == 1) {
+    lrfsPrint();
+  }
+  if(sensor == 2) {
+    lightPrint();
+  }
+  if(sensor == 3) {
+    thermalPrint();
+  }
+  if(sensor == 4) {
+    imuPrint();
+  }
+  if(sensor == 5) {
+    wallCorrectionPrint();
+  }
 }
-
-void tileMove(int direction) {
-    if(direction == 1) {
-
-    }
-}
-
 
 // ============ Slave Teensy ============
 void receive() {
@@ -183,75 +191,55 @@ void theaterChaseRainbow(uint8_t wait) {
 
 // ============ Setup ============
 void setup() {
-    #if DEBUG
-        Serial.begin(TEENSY_BAUD_RATE);
-    #endif
-    Serial1.begin(TEENSY_BAUD_RATE);
-    lrfs.init();
-    light.init();
-    motors.init();
-    pinMode(MASTER_LED, OUTPUT);
-    Serial.begin(9600);
-    imu.init();
-    // thermLeft.begin();
-    // thermLeft.setUnit(TEMP_C);
-    #if defined (__AVR_ATtiny85__)
-    if (F_CPU == 16000000) clock_prescale_set(clock_div_1);
-    #endif
-    strip.begin();
-    strip.setBrightness(20);
-    strip.show();
+  #if DEBUG
+      Serial.begin(TEENSY_BAUD_RATE);
+  #endif
+  Serial1.begin(TEENSY_BAUD_RATE);
+  lrfs.init();
+  light.init();
+  motors.init();
+  pinMode(MASTER_LED, OUTPUT);
+  Serial.begin(9600);
+  imu.init();
+  // thermLeft.begin();
+  // thermLeft.setUnit(TEMP_C);
+  #if defined (__AVR_ATtiny85__)
+  if (F_CPU == 16000000) clock_prescale_set(clock_div_1);
+  #endif
+  strip.begin();
+  strip.setBrightness(20);
+  strip.show();
 }
+
 
 
 void loop() {
   // ------------ updates ------------
-  // rainbow(10);
-  // debug(4);
-  // imu.update();
-  // lrfs.update();
-  // masterFlash();
-  // receive();
-  // while(lrfs.value[1] > 150) {
-    imu.update();
-    lrfs.update();
-    double leftCorrection = -2*pid.update(imu.horizontalHeading, 2.00, 0.00);
-    double rightCorrection = 2*pid.update(imu.horizontalHeading, 358.00, 0.00);
-    motors.update(100, 100);
-    if(leftCorrection < rightCorrection) {
-      motors.update(leftCorrection, -leftCorrection);
+  imu.update();
+  IMUCorrection = round(IMUPID.update(imu.horizontalHeading, direction, 0));
+  LRFCorrection = round(LRFPID.update(lrfs.value[2, 3, 4, 5], 150, 150));
+  // Serial.print(IMUCorrection);
+  // Serial.print("\t");
+  // Serial.println("IMU Correction");
+
+  // debug(1);
+  // Serial.println(lrfs.value[1]);
+  masterFlash();
+  receive();
+  // Serial.println(direction);
+  lrfs.update();
+  if(lrfs.average(0, 1) > 100) {
+    motors.update(100, 100, IMUCorrection);
+  }
+  else {
+    direction += 90;
+    direction %= 360;
+    direction = direction < 0 ? direction += 360 : direction;
+    IMUCorrection = round(IMUPID.update(imu.horizontalHeading, direction, 0));
+    while(!motors.setOrientation(IMUCorrection)) {
+      imu.update();
+      IMUCorrection = round(IMUPID.update(imu.horizontalHeading, direction, 0));
+      // Serial.println(IMUCorrection);
     }
-    else if(rightCorrection < leftCorrection) {
-      motors.update(-rightCorrection, rightCorrection);
-    }
-    else {
-      motors.update(100, 100);
-    }
-    Serial.print(leftCorrection);
-    Serial.print(" ");
-    Serial.print(rightCorrection);
-    Serial.print("\t");
-    Serial.println("Left correction, Right correction");
-    // debug(4);
-    masterFlash();
-    receive();
-  // }
-  // motors.update(0, 0);
-  // if(lrfs.value[3] > 150) {
-  //   if(imu.horizontalHeading != (imu.horizontalHeading - 90)) {
-  //     motors.update(-200, 200);
-  //   }
-  // }
-  // else if(lrfs.value[4] > 150) {
-  //   while(imu.horizontalHeading != (imu.horizontalHeading + 90)) {
-  //     imu.update();
-  //     motors.update(200, -200);
-  //   }
-  // }
-  // else {
-  //   while(imu.horizontalHeading != (imu.horizontalHeading + 180)) {
-  //     imu.update();
-  //     motors.update(200, -200);
-  //   }
-  // }
+  }
 }
