@@ -38,7 +38,8 @@
 
 // RGB Leds
 #define NUM_RGB_LEDS 60
-#define DATA_PIN 23
+#define RGB_PIN 23
+#define LED_BLINK 500
 
 
 // Stepper
@@ -58,6 +59,10 @@
 #define ACC_FULL_SCALE_4_G 0x08
 #define ACC_FULL_SCALE_8_G 0x10
 #define ACC_FULL_SCALE_16_G 0x18
+
+// Corrections
+double IMUCorrection;
+double LRFCorrection;
 
 struct Coordinate {
     int8_t x;
