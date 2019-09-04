@@ -1,5 +1,5 @@
-#ifndef COMMON_H_
-#define COMMON_H_
+#ifndef COLOR_H_
+#define COLOR_H_
 #include <Common.h>
 
 #define RED 255, 0, 0
