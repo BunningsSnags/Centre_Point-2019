@@ -7,6 +7,7 @@
 #include <Adafruit_NeoPixel.h>
 #include <MPU.h>
 #include <PID.h>
+#include <Common.h>
 #ifdef __AVR__
   #include <avr/power.h>
 #endif
@@ -18,10 +19,11 @@ LightSensor light;
 MPU imu;
 PID IMUPID = PID(10, 0, 0, 255);
 PID LRFPID = PID(10, 0, 0, 255);
-// PID turnPID = PID(10.0, 0.0, 0.0);
-Adafruit_NeoPixel strip(NUM_RGB_LEDS, DATA_PIN, NEO_GRB + NEO_KHZ800);
-int direction = 0;
-
+Adafruit_NeoPixel strip(NUM_RGB_LEDS, RGB_PIN, NEO_GRB + NEO_KHZ800);
+// Corrections
+double IMUCorrection;
+double LRFCorrection;
+double direction = 0;
 
 // ------------ Timers ------------
 Timer ledTimer(MASTER_BLINK);
@@ -30,6 +32,25 @@ void masterFlash() {
     if(ledTimer.timeHasPassed()){
         digitalWrite(MASTER_LED, ledOn);
         ledOn = !ledOn;
+    }
+}
+
+// ============ Slave Teensy ============
+void receive() {
+    while(Serial1.available() >= SLAVE_PACKET_SIZE) {
+        uint8_t firstByte = Serial1.read();
+        uint8_t secondByte = Serial1.peek();
+        if(firstByte == SLAVE_START_BYTE && secondByte == SLAVE_START_BYTE) {
+            Serial1.read();
+            uint8_t buffer[8];
+            for(int i = 0; i < 8; i++) {
+                buffer[i] = Serial1.read();
+            }
+            lrfs.value[4] = buffer[0] << 8 | buffer[1];
+            lrfs.value[5] = buffer[2] << 8 | buffer[3];
+            lrfs.value[6] = buffer[4] << 8 | buffer[5];
+            lrfs.value[7] = buffer[6] << 8 | buffer[7];
+        }
     }
 }
 
@@ -98,25 +119,6 @@ int lrfInput() {
   return input;
 }
 
-// ============ Slave Teensy ============
-void receive() {
-    while(Serial1.available() >= SLAVE_PACKET_SIZE) {
-        uint8_t firstByte = Serial1.read();
-        uint8_t secondByte = Serial1.peek();
-        if(firstByte == SLAVE_START_BYTE && secondByte == SLAVE_START_BYTE) {
-            Serial1.read();
-            uint8_t buffer[8];
-            for(int i = 0; i < 8; i++) {
-                buffer[i] = Serial1.read();
-            }
-            lrfs.value[4] = buffer[0] << 8 | buffer[1];
-            lrfs.value[5] = buffer[2] << 8 | buffer[3];
-            lrfs.value[6] = buffer[4] << 8 | buffer[5];
-            lrfs.value[7] = buffer[6] << 8 | buffer[7];
-        }
-    }
-}
-
 // Lights
 // Input a value 0 to 255 to get a color value.
 // The colours are a transition r - g - b - back to r.
@@ -133,11 +135,11 @@ uint32_t Wheel(byte WheelPos) {
   return strip.Color(WheelPos * 3, 255 - WheelPos * 3, 0);
 }
 
-void colorWipe(uint32_t c/*, uint8_t wait*/) {
+void colorWipe(uint32_t c, uint8_t wait) {
   for(uint16_t i=0; i<strip.numPixels(); i++) {
     strip.setPixelColor(i, c);
     strip.show();
-    // delay(wait);
+    delay(wait);
   }
 }
 
@@ -202,6 +204,16 @@ void theaterChaseRainbow(uint8_t wait) {
   }
 }
 
+// ============ updates ============
+void update() {
+  imu.update();
+  lrfs.update();
+  masterFlash();
+  receive();
+  IMUCorrection = round(IMUPID.update(imu.horizontalHeading, direction, 0));
+  LRFCorrection = round(LRFPID.update(lrfInput(), lrfSetPoint(), 0));
+}
+
 // ============ Setup ============
 void setup() {
   #if DEBUG
@@ -225,40 +237,29 @@ void setup() {
 }
 
 
-
 void loop() {
-  // ------------ updates ------------
-  update() {
-    imu.update();
-    lrfs.update();
-    masterFlash();
-    receive();
-    IMUCorrection = round(IMUPID.update(imu.horizontalHeading, direction, 0));
-    LRFCorrection = round(LRFPID.update(lrfInput, lrfSetPoint(), 0));
-  }
   update();
   // debug(1);
 
   // ------------ Main ------------
-  // while(/* Doesnt see heat pack */) {
+  // if(/* Doesnt see heat pack */) {
     if(lrfs.average(0, 1) > 100) {
       motors.update(100, 100, LRFCorrection);
     }
     else {
-      direction += 90;
-      direction %= 360;
-      direction = direction < 0 ? direction += 360 : direction;
+      direction = mod(direction + 90, 360);
       IMUCorrection = round(IMUPID.update(imu.horizontalHeading, direction, 0));
       while(!motors.setOrientation(IMUCorrection)) {
         update();
       }
     }
   // }
-  // colorWipe(255);
+  motors.update(0, 0, LRFCorrection);
+  // colorWipe(strip.Color(GREEN), 1);
   // delay(500);
-  // colorWipe(255);
+  // colorWipe(strip.Color(GREEN), 1);
   // delay(500);
-  // colorWipe(255);
+  // colorWipe(strip.Color(GREEN), 1);
   // delay(500);
   // //Figure out how to stop it from seeing the heat pad now
 }
