@@ -9,5 +9,10 @@ void StepperMotor::init() {
 }
 
 void StepperMotor::cube(int amount) {
-    
+
+    for (i = 0; i<CUBE_STEP; i++) {
+        digitalWrite(steppin, LOW);
+        digitalWrite(steppin, HIGH);
+        delayMicroseconds(500);
+    }
 }
