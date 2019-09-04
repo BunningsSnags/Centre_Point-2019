@@ -2,6 +2,7 @@
 #define COMMON_H_
 
 #include <Pins.h>
+#include <Colours.h>
 #include <Arduino.h>
 
 
@@ -60,9 +61,7 @@
 #define ACC_FULL_SCALE_8_G 0x10
 #define ACC_FULL_SCALE_16_G 0x18
 
-// Corrections
-double IMUCorrection;
-double LRFCorrection;
+
 
 struct Coordinate {
     int8_t x;
@@ -77,5 +76,6 @@ struct Vector3D {
 };
 
 float floatMod(float x, float m);
+int mod(int x, int m);
 
 #endif
