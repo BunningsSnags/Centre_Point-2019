@@ -267,10 +267,16 @@ void loop() {
   // }
   // motors.update(0, 0, LRFCorrection);
   // colorWipe(strip.Color(GREEN), 1);
-  // delay(500);
+  // delay(100);
+  // colorWipe(strip.Color(0, 0, 0) 1);
+  // delay(100);
   // colorWipe(strip.Color(GREEN), 1);
-  // delay(500);
+  // delay(100);
+  // colorWipe(strip.Color(0, 0, 0) 1);
+  // delay(100);
   // colorWipe(strip.Color(GREEN), 1);
-  // delay(500);
+  // delay(100);
+  // colorWipe(strip.Color(0, 0, 0) 1);
+  // delay(100);
   // //Figure out how to stop it from seeing the heat pad now
 }
