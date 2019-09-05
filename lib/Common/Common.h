@@ -61,6 +61,10 @@
 #define ACC_FULL_SCALE_8_G 0x10
 #define ACC_FULL_SCALE_16_G 0x18
 
+// Thermal Sensors
+#define THERMAL_NUM 4
+#define THERMAL_CALIBRATION_COUNT 5
+#define THERMAL_CALIBRATION_TIME 50
 
 
 struct Coordinate {

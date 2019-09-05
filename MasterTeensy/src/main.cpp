@@ -7,7 +7,7 @@
 #include <Adafruit_NeoPixel.h>
 #include <MPU.h>
 #include <PID.h>
-#include <Common.h>
+#include <ThermalSensor.h>
 #ifdef __AVR__
   #include <avr/power.h>
 #endif
@@ -19,6 +19,7 @@ LightSensor light;
 MPU imu;
 PID IMUPID = PID(10, 0, 0, 255);
 PID LRFPID = PID(10, 0, 0, 255);
+ThermalSensor therm;
 Adafruit_NeoPixel strip(NUM_RGB_LEDS, RGB_PIN, NEO_GRB + NEO_KHZ800);
 // Corrections
 double IMUCorrection;
@@ -207,7 +208,9 @@ void theaterChaseRainbow(uint8_t wait) {
 // ============ updates ============
 void update() {
   imu.update();
+  light.update()
   lrfs.update();
+  therm.update();
   masterFlash();
   receive();
   IMUCorrection = round(IMUPID.update(imu.horizontalHeading, direction, 0));
@@ -223,11 +226,10 @@ void setup() {
   lrfs.init();
   light.init();
   motors.init();
+  therm.init();
   pinMode(MASTER_LED, OUTPUT);
   Serial.begin(9600);
   imu.init();
-  // thermLeft.begin();
-  // thermLeft.setUnit(TEMP_C);
   #if defined (__AVR_ATtiny85__)
   if (F_CPU == 16000000) clock_prescale_set(clock_div_1);
   #endif
@@ -242,7 +244,7 @@ void loop() {
   // debug(1);
 
   // ------------ Main ------------
-  // if(/* Doesnt see heat pack */) {
+  // if(therm.victim[i] <= 20)) {
     if(lrfs.average(0, 1) > 100) {
       motors.update(100, 100, LRFCorrection);
     }
@@ -254,7 +256,7 @@ void loop() {
       }
     }
   // }
-  motors.update(0, 0, LRFCorrection);
+  // motors.update(0, 0, LRFCorrection);
   // colorWipe(strip.Color(GREEN), 1);
   // delay(500);
   // colorWipe(strip.Color(GREEN), 1);
