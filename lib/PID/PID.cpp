@@ -18,7 +18,6 @@ double PID::update(double input, double setpoint, double modulus){
     error = error < 0 ? error + 360 : error;
 
     error = -(error < 180 ? error : -(360 - error));
-    Serial.println(error);
 
 
     ulong currentTime = micros();

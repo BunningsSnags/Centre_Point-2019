@@ -249,10 +249,19 @@ void loop() {
       motors.update(100, 100, LRFCorrection);
     }
     else {
-      direction = mod(direction + 90, 360);
-      IMUCorrection = round(IMUPID.update(imu.horizontalHeading, direction, 0));
-      while(!motors.setOrientation(IMUCorrection)) {
-        update();
+        if(lrfs.average(2, 4) < lrfs.average(3, 5)) {
+          direction = mod(direction + 90, 360);
+          IMUCorrection = round(IMUPID.update(imu.horizontalHeading, direction, 0));
+          while(!motors.setOrientation(IMUCorrection)) {
+            update();
+        }
+      }
+      else if(lrfs.average(3, 5) < lrfs.average(2, 4)) {
+          direction = mod(direction - 90, 360);
+          IMUCorrection = round(IMUPID.update(imu.horizontalHeading, direction, 0));
+          while(!motors.setOrientation(IMUCorrection)) {
+            update();
+        }
       }
     }
   // }
