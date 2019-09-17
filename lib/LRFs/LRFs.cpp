@@ -12,7 +12,6 @@ uint16_t LRFs::average(int lrf1, int lrf2) {
     return averaged;
 }
 
-// HardwareSerial Serial2[] = {Serial2, Serial3, Serial4, Serial5};
 void LRFs::update() {
     while(Serial2.available() >= LRF_PACKET_SIZE) {
         uint8_t firstbyte = Serial2.read();
