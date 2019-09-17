@@ -208,7 +208,7 @@ void theaterChaseRainbow(uint8_t wait) {
 // ============ updates ============
 void update() {
   imu.update();
-  light.update()
+  light.update();
   lrfs.update();
   therm.update();
   masterFlash();
@@ -246,17 +246,17 @@ void loop() {
   // ------------ Main ------------
   // if(therm.victim[i] <= 20)) {
     if(lrfs.average(0, 1) > 100) {
-      motors.update(100, 100, LRFCorrection);
+      motors.update(150, 150, IMUCorrection);
     }
     else {
-        if(lrfs.average(2, 4) < lrfs.average(3, 5)) {
+        if(lrfs.average(2, 4) > lrfs.average(3, 5)) {
           direction = mod(direction + 90, 360);
           IMUCorrection = round(IMUPID.update(imu.horizontalHeading, direction, 0));
           while(!motors.setOrientation(IMUCorrection)) {
             update();
         }
       }
-      else if(lrfs.average(3, 5) < lrfs.average(2, 4)) {
+      else if(lrfs.average(3, 5) > lrfs.average(2, 4)) {
           direction = mod(direction - 90, 360);
           IMUCorrection = round(IMUPID.update(imu.horizontalHeading, direction, 0));
           while(!motors.setOrientation(IMUCorrection)) {
