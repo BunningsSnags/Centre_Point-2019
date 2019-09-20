@@ -17,8 +17,8 @@ LRFs lrfs;
 MotorController motors;
 LightSensor light;
 MPU imu;
-PID IMUPID = PID(10, 0, 0, 255);
-PID LRFPID = PID(10, 0, 0, 255);
+PID IMUPID = PID(15, 0, 0, 255*2);
+PID LRFPID = PID(1, 0, 0, 255*2);
 ThermalSensor therm;
 Adafruit_NeoPixel strip(NUM_RGB_LEDS, RGB_PIN, NEO_GRB + NEO_KHZ800);
 // Corrections
@@ -241,29 +241,30 @@ void setup() {
 
 void loop() {
   update();
-  // debug(1);
+  debug(5);
+  receive();
 
   // ------------ Main ------------
   // if(therm.victim[i] <= 20)) {
     if(lrfs.average(0, 1) > 100) {
-      motors.update(150, 150, IMUCorrection);
+      motors.update(150, 150, LRFCorrection);
     }
-    else {
-        if(lrfs.average(2, 4) > lrfs.average(3, 5)) {
-          direction = mod(direction + 90, 360);
-          IMUCorrection = round(IMUPID.update(imu.horizontalHeading, direction, 0));
-          while(!motors.setOrientation(IMUCorrection)) {
-            update();
-        }
-      }
-      else if(lrfs.average(3, 5) > lrfs.average(2, 4)) {
-          direction = mod(direction - 90, 360);
-          IMUCorrection = round(IMUPID.update(imu.horizontalHeading, direction, 0));
-          while(!motors.setOrientation(IMUCorrection)) {
-            update();
-        }
-      }
-    }
+    // else {
+    //     if(lrfs.average(2, 4) > lrfs.average(3, 5)) {
+    //       direction = mod(direction + 90, 360);
+    //       IMUCorrection = round(IMUPID.update(imu.horizontalHeading, direction, 0));
+    //       while(!motors.setOrientation(IMUCorrection)) {
+    //         update();
+    //     }
+    //   }
+    //   else if(lrfs.average(3, 5) > lrfs.average(2, 4)) {
+    //       direction = mod(direction - 90, 360);
+    //       IMUCorrection = round(IMUPID.update(imu.horizontalHeading, direction, 0));
+    //       while(!motors.setOrientation(IMUCorrection)) {
+    //         update();
+    //     }
+      // }
+    // }
   // }
   // motors.update(0, 0, LRFCorrection);
   // colorWipe(strip.Color(GREEN), 1);

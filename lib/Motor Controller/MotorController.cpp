@@ -15,6 +15,19 @@ void MotorController::update(int16_t left, int16_t right, int16_t rotation) {
     left = left - rotation;
     right = right + rotation;
 
+    left = min(left, 255);
+    left = max(left, -255);
+
+    right = min(right, 255);
+    right = max(right, -255);
+
+    // Serial.print(left);
+    // Serial.print(" Left ");
+    // Serial.println(" ");
+    // Serial.print(right);
+    // Serial.print(" Right");
+    // Serial.println(" ");
+
 
     if(left > 0) {
         digitalWrite(LEFT_INONE, HIGH);
