@@ -1,6 +1,7 @@
 #ifndef COLOR_H_
 #define COLOR_H_
 #include <Common.h>
+#include <Pins.h>
 
 #define RED 255, 0, 0
 #define ORANGE 255, 128, 0

@@ -1,7 +1,6 @@
 #include <LRFs.h>
 #include <ThermalSensor.h>
 #include <Timer.h>
-#include <Pins.h>
 
 LRFs lrfs;
 Timer ledTimer(SLAVE_BLINK);
