@@ -18,7 +18,7 @@ MotorController motors;
 LightSensor light;
 MPU imu;
 PID IMUPID = PID(15, 0, 0, 255*2);
-PID LRFPID = PID(1, 0, 0, 255*2);
+PID LRFPID = PID(1, 0, 1, 255*2);
 ThermalSensor therm;
 Adafruit_NeoPixel strip(NUM_RGB_LEDS, RGB_PIN, NEO_GRB + NEO_KHZ800);
 // Corrections
@@ -55,6 +55,19 @@ void receive() {
     }
 }
 
+int lrfInput() {
+  int leftSide = lrfs.wallAverage(2, 4, imu.horizontalHeading);
+  Serial.print(leftSide);
+  Serial.println(" left");
+  int rightSide = lrfs.wallAverage(3, 5, imu.horizontalHeading);
+  Serial.print(rightSide);
+  Serial.println(" right");
+  int16_t input = leftSide-rightSide;
+  Serial.print(input);
+  Serial.println(" input");
+  return input;
+}
+
 // ============ Debugers ============
 // LRF
 void lrfsPrint() {
@@ -88,6 +101,11 @@ void correctionPrint() {
   Serial.print("\t");
   Serial.println("IMU, LRF");
 }
+void wallPrint() {
+  Serial.print(lrfInput());
+  Serial.print("\t");
+  Serial.println("input");
+}
 // Debuging function
 void debug(int sensor) {
   if(sensor == 1) {
@@ -105,19 +123,9 @@ void debug(int sensor) {
   if(sensor == 5) {
     correctionPrint();
   }
-}
-
-int lrfSetPoint() {
-  int centre = 0;
-  centre = (lrfs.average(2, 4) + lrfs.average(3, 5))/2;
-  return centre;
-}
-
-int lrfInput() {
-  int leftSide = lrfs.average(2, 4);
-  int rightSide = lrfs.average(3, 5);
-  int input = leftSide-rightSide;
-  return input;
+  if(sensor == 6) {
+    wallPrint();
+  }
 }
 
 // Lights
@@ -214,7 +222,7 @@ void update() {
   masterFlash();
   receive();
   IMUCorrection = round(IMUPID.update(imu.horizontalHeading, direction, 0));
-  LRFCorrection = round(LRFPID.update(lrfInput(), lrfSetPoint(), 0));
+  LRFCorrection = round(LRFPID.update(lrfInput(), 0, 0));
 }
 
 // ============ Setup ============
@@ -238,19 +246,21 @@ void setup() {
   strip.show();
 }
 
-
 void loop() {
   update();
-  debug(5);
+  // debug(1);
   receive();
 
   // ------------ Main ------------
   // if(therm.victim[i] <= 20)) {
     if(lrfs.average(0, 1) > 100) {
-      motors.update(150, 150, LRFCorrection);
+      motors.update(100, 100, LRFCorrection);
+      // colorWipe(strip.Color(BLUE), 1);
     }
+    // motors.update(-150, 150, 0);
     // else {
     //     if(lrfs.average(2, 4) > lrfs.average(3, 5)) {
+    //       // colorWipe(strip.Color(RED), 1);
     //       direction = mod(direction + 90, 360);
     //       IMUCorrection = round(IMUPID.update(imu.horizontalHeading, direction, 0));
     //       while(!motors.setOrientation(IMUCorrection)) {
@@ -258,14 +268,14 @@ void loop() {
     //     }
     //   }
     //   else if(lrfs.average(3, 5) > lrfs.average(2, 4)) {
+    //       // colorWipe(strip.Color(GREEN), 1);
     //       direction = mod(direction - 90, 360);
     //       IMUCorrection = round(IMUPID.update(imu.horizontalHeading, direction, 0));
     //       while(!motors.setOrientation(IMUCorrection)) {
     //         update();
     //     }
-      // }
+    //   }
     // }
-  // }
   // motors.update(0, 0, LRFCorrection);
   // colorWipe(strip.Color(GREEN), 1);
   // delay(100);
@@ -280,4 +290,5 @@ void loop() {
   // colorWipe(strip.Color(0, 0, 0) 1);
   // delay(100);
   // //Figure out how to stop it from seeing the heat pad now
+  // }
 }

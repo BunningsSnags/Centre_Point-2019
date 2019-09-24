@@ -1,4 +1,6 @@
-#include "LRFs.h"
+#include <LRFs.h>
+#include <MPU.h>
+#include <math.h>
 
 void LRFs::init() {
     Serial2.begin(LRF_BAUD_RATE);
@@ -9,6 +11,13 @@ void LRFs::init() {
 
 uint16_t LRFs::average(int lrf1, int lrf2) {
     uint16_t averaged = (value[lrf1] + value[lrf2])/2;
+    return averaged;
+}
+
+uint16_t LRFs::wallAverage(int lrf1, int lrf2, double heading) {
+    int sensor1 = value[lrf1] * cos(heading * PI/180);
+    int sensor2 = value[lrf2] * cos(heading * PI/180);
+    uint16_t averaged = (sensor1 + sensor2)/2;
     return averaged;
 }
 
