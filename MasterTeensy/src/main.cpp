@@ -18,7 +18,7 @@ MotorController motors;
 LightSensor light;
 MPU imu;
 PID IMUPID = PID(15, 0, 0, 255*2);
-PID LRFPID = PID(5, 0, 0, 255*2);
+PID LRFPID = PID(3, 0, 0, 255*2);
 ThermalSensor therm;
 Adafruit_NeoPixel strip(NUM_RGB_LEDS, RGB_PIN, NEO_GRB + NEO_KHZ800);
 // Corrections
@@ -216,7 +216,7 @@ void update() {
   masterFlash();
   receive();
   IMUCorrection = round(IMUPID.update(imu.horizontalHeading, direction, 0));
-  LRFCorrection = round(LRFPID.update(lrfInput(), 0, 0));
+  LRFCorrection = -round(LRFPID.update(lrfInput(), 0, 0));
 }
 
 // ============ Setup ============
@@ -249,7 +249,7 @@ void loop() {
   // if(!therm.spotHeat(1, 30)) {
     // colorWipe(strip.Color(RED), 1);
     if(lrfs.average(0, 1) > 100) {
-      motors.update(SPEED, SPEED, IMUCorrection);
+      motors.update(SPEED, SPEED, LRFCorrection);
       // colorWipe(strip.Color(BLUE), 1);
     }
     // else {
