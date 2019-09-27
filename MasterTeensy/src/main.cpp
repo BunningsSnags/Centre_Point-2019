@@ -249,7 +249,7 @@ void loop() {
   // if(!therm.spotHeat(1, 30)) {
     // colorWipe(strip.Color(RED), 1);
     if(lrfs.average(0, 1) > 100) {
-      motors.update(SPEED, SPEED, LRFCorrection);
+      motors.update(SPEED, SPEED, IMUCorrection);
       // colorWipe(strip.Color(BLUE), 1);
     }
     // else {
