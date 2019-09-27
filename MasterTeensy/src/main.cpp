@@ -18,7 +18,7 @@ MotorController motors;
 LightSensor light;
 MPU imu;
 PID IMUPID = PID(15, 0, 0, 255*2);
-PID LRFPID = PID(1, 0, 1, 255*2);
+PID LRFPID = PID(3, 0, 0.75, 255*2);
 ThermalSensor therm;
 Adafruit_NeoPixel strip(NUM_RGB_LEDS, RGB_PIN, NEO_GRB + NEO_KHZ800);
 // Corrections
@@ -57,19 +57,12 @@ void receive() {
 
 int lrfInput() {
   int leftSide = lrfs.wallAverage(2, 4, imu.horizontalHeading);
-  Serial.print(leftSide);
-  Serial.println(" left");
   int rightSide = lrfs.wallAverage(3, 5, imu.horizontalHeading);
-  Serial.print(rightSide);
-  Serial.println(" right");
   int16_t input = leftSide-rightSide;
-  Serial.print(input);
-  Serial.println(" input");
   return input;
 }
 
-// ============ Debugers ============
-// LRF
+// ============ Debugers ==========````````````````````````````````````````````````````````````````````````````````````````
 void lrfsPrint() {
     for(int i = 0; i < LRF_NUM; i++) {
         Serial.print(lrfs.value[i]);
@@ -248,16 +241,15 @@ void setup() {
 
 void loop() {
   update();
-  // debug(1);
+  debug(6);
   receive();
 
   // ------------ Main ------------
   // if(therm.victim[i] <= 20)) {
     if(lrfs.average(0, 1) > 100) {
-      motors.update(100, 100, LRFCorrection);
+      motors.update(150, 150, LRFCorrection);
       // colorWipe(strip.Color(BLUE), 1);
     }
-    // motors.update(-150, 150, 0);
     // else {
     //     if(lrfs.average(2, 4) > lrfs.average(3, 5)) {
     //       // colorWipe(strip.Color(RED), 1);
