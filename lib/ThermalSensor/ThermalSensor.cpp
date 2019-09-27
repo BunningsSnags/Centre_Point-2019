@@ -30,6 +30,16 @@ void ThermalSensor::update() {
     victim[1] = (value[1] > threshold[1]);
 }
 
+bool ThermalSensor::spotHeat(int sensor, int heat) {
+    if(victim[sensor] <= heat) {
+        spot = true;
+    }
+    if(victim[sensor] >= heat) {
+        spot = false;
+    }
+    return spot;
+}
+
 void ThermalSensor::calibrate() {
     for(uint8_t i = 0; i < THERMAL_CALIBRATION_COUNT; i++) {
         update();
