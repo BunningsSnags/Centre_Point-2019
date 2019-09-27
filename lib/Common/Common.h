@@ -66,6 +66,9 @@
 #define THERMAL_CALIBRATION_COUNT 5
 #define THERMAL_CALIBRATION_TIME 50
 
+// Motor
+#define SPEED 150
+
 
 struct Coordinate {
     int8_t x;

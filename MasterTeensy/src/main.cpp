@@ -18,7 +18,7 @@ MotorController motors;
 LightSensor light;
 MPU imu;
 PID IMUPID = PID(15, 0, 0, 255*2);
-PID LRFPID = PID(3, 0, 0.75, 255*2);
+PID LRFPID = PID(5, 0, 0, 255*2);
 ThermalSensor therm;
 Adafruit_NeoPixel strip(NUM_RGB_LEDS, RGB_PIN, NEO_GRB + NEO_KHZ800);
 // Corrections
@@ -78,6 +78,7 @@ void lightPrint() {
 }
 // Thermal
 void thermalPrint() {
+  Serial.println(therm.victim[0]);
 }
 // IMU
 void imuPrint() {
@@ -241,13 +242,14 @@ void setup() {
 
 void loop() {
   update();
-  debug(6);
+  debug(1);
   receive();
 
   // ------------ Main ------------
-  // if(therm.victim[i] <= 20)) {
+  // if(!therm.spotHeat(1, 30)) {
+    // colorWipe(strip.Color(RED), 1);
     if(lrfs.average(0, 1) > 100) {
-      motors.update(150, 150, LRFCorrection);
+      motors.update(SPEED, SPEED, LRFCorrection);
       // colorWipe(strip.Color(BLUE), 1);
     }
     // else {
@@ -268,6 +270,7 @@ void loop() {
     //     }
     //   }
     // }
+    // colorWipe(strip.Color(GREEN), 1);
   // motors.update(0, 0, LRFCorrection);
   // colorWipe(strip.Color(GREEN), 1);
   // delay(100);
@@ -282,5 +285,4 @@ void loop() {
   // colorWipe(strip.Color(0, 0, 0) 1);
   // delay(100);
   // //Figure out how to stop it from seeing the heat pad now
-  // }
 }

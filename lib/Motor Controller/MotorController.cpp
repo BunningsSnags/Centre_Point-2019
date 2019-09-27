@@ -12,21 +12,18 @@ void MotorController::init() {
 
 void MotorController::update(int16_t left, int16_t right, int16_t rotation) {
 
+    // Serial.printf("Left: %d - %d = %d\n", left, rotation, left - rotation);
+    // Serial.printf("Right: %d + %d = %d\n", right, rotation, right + rotation);
+
     left = left - rotation;
     right = right + rotation;
-
-    left = min(left, 255);
-    left = max(left, -255);
 
     right = min(right, 255);
     right = max(right, -255);
 
-    // Serial.print(left);
-    // Serial.print(" Left ");
-    // Serial.println(" ");
-    // Serial.print(right);
-    // Serial.print(" Right");
-    // Serial.println(" ");
+    left = min(left, 255);
+    left = max(left, -255);
+    // Serial.printf("Left: %d, Right: %d\n", right, left);
 
 
     if(left > 0) {

@@ -2,12 +2,12 @@
 #define PINS_H_
 
 // Motors
-#define LEFT_PWM 21
-#define LEFT_INONE 24
-#define LEFT_INTWO 25
-#define RIGHT_PWM 20
-#define RIGHT_INONE 27
-#define RIGHT_INTWO 26
+#define RIGHT_PWM 21
+#define RIGHT_INONE 24
+#define RIGHT_INTWO 25
+#define LEFT_PWM 20
+#define LEFT_INONE 27
+#define LEFT_INTWO 26
 
 // Stepper
 #define PWM 
