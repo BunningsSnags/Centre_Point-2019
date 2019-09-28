@@ -216,7 +216,7 @@ void update() {
   masterFlash();
   receive();
   IMUCorrection = round(IMUPID.update(imu.horizontalHeading, direction, 0));
-  LRFCorrection = -round(LRFPID.update(lrfInput(), 0, 0));
+  LRFCorrection = round(LRFPID.update(-lrfInput(), 0, 0));
 }
 
 // ============ Setup ============
