@@ -249,7 +249,7 @@ void loop() {
   receive();
 
   // ------------ Main ------------
-  if(!therm.spotHeat(30)) {
+  // if(!therm.spotHeat(30)) {
     if(lrfs.average(0, 1) > 100) {
         motors.update(SPEED, SPEED, IMUCorrection);
         // colorWipe(strip.Color(BLUE), 1);
@@ -272,20 +272,23 @@ void loop() {
             }
           }
         }
-      }
-  else {
-    motors.update(0, 0, LRFCorrection);
-    colorWipe(strip.Color(GREEN), 1);
-    delay(100);
-    colorWipe(strip.Color(0, 0, 0), 1);
-    delay(100);
-    colorWipe(strip.Color(GREEN), 1);
-    delay(100);
-    colorWipe(strip.Color(0, 0, 0), 1);
-    delay(100);
-    colorWipe(strip.Color(GREEN), 1);
-    delay(100);
-    colorWipe(strip.Color(0, 0, 0), 1);
-    delay(100);
-  }
+      // }
+  // else {
+  //   update();
+  //   motors.update(0, 0, IMUCorrection);
+  //   colorWipe(strip.Color(GREEN), 1);
+  //   delay(100);
+  //   colorWipe(strip.Color(0, 0, 0), 1);
+  //   delay(100);
+  //   colorWipe(strip.Color(GREEN), 1);
+  //   delay(100);
+  //   colorWipe(strip.Color(0, 0, 0), 1);
+  //   delay(100);
+  //   colorWipe(strip.Color(GREEN), 1);
+  //   delay(100);
+  //   colorWipe(strip.Color(0, 0, 0), 1);
+  //   delay(100);
+  //   !therm.spotHeat(30);
+  //   therm.value[0] = 0;
+  // }
 }
