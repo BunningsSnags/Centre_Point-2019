@@ -82,8 +82,7 @@ void thermalPrint() {
         Serial.print(therm.value[i]);
         Serial.print("\t");
     }
-    Serial.println("Front, Left, Right, Back");
-    Serial.printf("Spots heated object: %d\n", therm.spotHeat(30));
+    Serial.printf("Front, Left, Right, Back, Spotted: %d\n", therm.spotHeat(30));
 }
 void imuPrint() {
   Serial.print(imu.horizontalHeading);
@@ -251,47 +250,42 @@ void loop() {
 
   // ------------ Main ------------
   if(!therm.spotHeat(30)) {
-    colorWipe(strip.Color(RED), 1);
-    if(!therm.spotHeat(20)) {
-      colorWipe(strip.Color(BLUE), 1);
-    }
-  // if(lrfs.average(0, 1) > 100) {
-  //     motors.update(SPEED, SPEED, IMUCorrection);
-  //     // colorWipe(strip.Color(BLUE), 1);
-  //   }
-  //   else {
-  //     if(lrfs.average(2, 4) > lrfs.average(3, 5)) {
-  //       // colorWipe(strip.Color(RED), 1);
-  //       direction = mod(direction + 90, 360);
-  //       IMUCorrection = round(IMUPID.update(imu.horizontalHeading, direction, 0));
-  //       while(!motors.setOrientation(IMUCorrection)) {
-  //         update();
-  //         }
-  //       }
-  //     else if(lrfs.average(3, 5) > lrfs.average(2, 4)) {
-  //         // colorWipe(strip.Color(GREEN), 1);
-  //         direction = mod(direction - 90, 360);
-  //         IMUCorrection = round(IMUPID.update(imu.horizontalHeading, direction, 0));
-  //         while(!motors.setOrientation(IMUCorrection)) {
-  //           update();
-  //       }
-  //     }
-  //   }
-  }
+    if(lrfs.average(0, 1) > 100) {
+        motors.update(SPEED, SPEED, IMUCorrection);
+        // colorWipe(strip.Color(BLUE), 1);
+        }
+        else {
+          if(lrfs.average(2, 4) > lrfs.average(3, 5)) {
+            // colorWipe(strip.Color(RED), 1);
+            direction = mod(direction + 90, 360);
+            IMUCorrection = round(IMUPID.update(imu.horizontalHeading, direction, 0));
+            while(!motors.setOrientation(IMUCorrection)) {
+              update();
+              }
+            }
+            else if(lrfs.average(3, 5) > lrfs.average(2, 4)) {
+              // colorWipe(strip.Color(GREEN), 1);
+              direction = mod(direction - 90, 360);
+              IMUCorrection = round(IMUPID.update(imu.horizontalHeading, direction, 0));
+              while(!motors.setOrientation(IMUCorrection)) {
+                update();
+            }
+          }
+        }
+      }
   else {
-  motors.update(0, 0, LRFCorrection);
-  colorWipe(strip.Color(GREEN), 1);
-  // delay(100);
-  // colorWipe(strip.Color(0, 0, 0), 1);
-  // delay(100);
-  // colorWipe(strip.Color(GREEN), 1);
-  // delay(100);
-  // colorWipe(strip.Color(0, 0, 0), 1);
-  // delay(100);
-  // colorWipe(strip.Color(GREEN), 1);
-  // delay(100);
-  // colorWipe(strip.Color(0, 0, 0), 1);
-  // delay(100);
-  // //Figure out how to stop it from seeing the heat pad now
+    motors.update(0, 0, LRFCorrection);
+    colorWipe(strip.Color(GREEN), 1);
+    delay(100);
+    colorWipe(strip.Color(0, 0, 0), 1);
+    delay(100);
+    colorWipe(strip.Color(GREEN), 1);
+    delay(100);
+    colorWipe(strip.Color(0, 0, 0), 1);
+    delay(100);
+    colorWipe(strip.Color(GREEN), 1);
+    delay(100);
+    colorWipe(strip.Color(0, 0, 0), 1);
+    delay(100);
   }
 }
