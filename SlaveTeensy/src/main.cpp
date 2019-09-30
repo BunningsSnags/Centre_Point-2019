@@ -3,6 +3,7 @@
 #include <Timer.h>
 
 LRFs lrfs;
+ThermalSensor therm;
 Timer ledTimer(SLAVE_BLINK);
 
 bool ledOn = true;
@@ -24,6 +25,8 @@ void send() {
     Serial1.write(lowByte(lrfs.value[2]));
     Serial1.write(highByte(lrfs.value[3]));
     Serial1.write(lowByte(lrfs.value[3]));
+    Serial1.write(therm.victim[0]);
+    Serial1.write(therm.victim[1]);
 }
 
 void setup() {

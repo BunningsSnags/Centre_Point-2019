@@ -10,5 +10,5 @@ if %input% == slave (
   echo Uploading to Slave
   cd SlaveTeensy
   platformio run -t upload
-  cd..
+  cd ..
 )

@@ -24,6 +24,11 @@
               pixel.
   @return  Adafruit_NeoPixel object. Call the begin() function before use.
 */
+
+// Adafruit_NeoPixel::colorFlash(int colour) {
+
+// }
+
 Adafruit_NeoPixel::Adafruit_NeoPixel(uint16_t n, uint16_t p, neoPixelType t) :
   begun(false), brightness(0), pixels(NULL), endTime(0) {
   updateType(t);

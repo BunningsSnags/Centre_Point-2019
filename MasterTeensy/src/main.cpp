@@ -51,6 +51,8 @@ void receive() {
             lrfs.value[5] = buffer[2] << 8 | buffer[3];
             lrfs.value[6] = buffer[4] << 8 | buffer[5];
             lrfs.value[7] = buffer[6] << 8 | buffer[7];
+            therm.victim[2] = buffer[8] == 0 ? false : true;
+            therm.victim[3] = buffer[9] == 0 ? false : true;
         }
     }
 }
@@ -78,7 +80,7 @@ void lightPrint() {
 }
 // Thermal
 void thermalPrint() {
-  Serial.println(therm.victim[1]);
+  Serial.println(therm.victim[4]);
 }
 // IMU
 void imuPrint() {

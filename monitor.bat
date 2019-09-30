@@ -10,5 +10,5 @@ if %input% == slave (
   echo Monitoring Slave
   cd SlaveTeensy
   pio device monitor
-  cd..
+  cd ..
 )
