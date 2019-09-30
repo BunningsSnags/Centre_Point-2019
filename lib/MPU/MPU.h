@@ -11,6 +11,7 @@ public:
     void update();
     float horizontalHeading;
     float verticalHeading;
+    bool checkRamp(int distance);
 private:
     Vector3D readGyroscope();
     void calibrate();

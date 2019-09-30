@@ -38,6 +38,18 @@ void MPU::update() {
     delay(10);
 }
 
+bool MPU::checkRamp(int distance) {
+    if(verticalHeading < 0+distance) {
+        return true;
+    }
+    else if(verticalHeading > 360-distance) {
+        return true;
+    }
+    else {
+        return false;
+    }
+}
+
 void MPU::calibrate() {
     for(uint8_t i = 0; i < MPU_CALIBRATION_COUNT; i++) {
         Vector3D readingGyro = readGyroscope();
