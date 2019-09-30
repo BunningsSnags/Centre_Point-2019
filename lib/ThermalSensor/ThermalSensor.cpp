@@ -31,14 +31,15 @@ void ThermalSensor::update() {
 }
 
 bool ThermalSensor::spotHeat(int heat) {
-    int victims[4] = {value[0], value[1], value[2], value[3]}
-    if(victims[] <= heat) {
-        spot = true;
+    for(int i = 0; i < 4; i++) {
+        if(value[i] >= heat) {
+            spot = true;
+        }
+        if(value[i] < heat) {
+            spot = false;
+        }
+        return spot;
     }
-    if(victims[] >= heat) {
-        spot = false;
-    }
-    return spot;
 }
 
 void ThermalSensor::calibrate() {

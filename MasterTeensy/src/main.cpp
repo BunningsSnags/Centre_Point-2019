@@ -72,22 +72,19 @@ void lrfsPrint() {
     }
     Serial.println("Front-Left, Front-Right, Left-Front, Right-Front, Left-Back, Right-Back, Back-Left, Back-Right");
 }
-// Light Sensor
 void lightPrint() {
     for(int i = 0; i < LIGHTSENSOR_NUM; i++) {
         Serial.println(light.light[i]);
     }
 }
-// Thermal
 void thermalPrint() {
   for(int i = 0; i < 4; i++) {
         Serial.print(therm.value[i]);
         Serial.print("\t");
     }
     Serial.println("Front, Left, Right, Back");
+    Serial.printf("Spots heated object: %d\n", therm.spotHeat(30));
 }
-}
-// IMU
 void imuPrint() {
   Serial.print(imu.horizontalHeading);
   Serial.print("\t");
@@ -253,8 +250,11 @@ void loop() {
   receive();
 
   // ------------ Main ------------
-  if(!therm.spotHeat(1, 30)) {
-    colorWipe(strip.Color(RED), 1); 
+  if(!therm.spotHeat(30)) {
+    colorWipe(strip.Color(RED), 1);
+    if(!therm.spotHeat(20)) {
+      colorWipe(strip.Color(BLUE), 1);
+    }
   // if(lrfs.average(0, 1) > 100) {
   //     motors.update(SPEED, SPEED, IMUCorrection);
   //     // colorWipe(strip.Color(BLUE), 1);
@@ -280,7 +280,7 @@ void loop() {
   }
   else {
   motors.update(0, 0, LRFCorrection);
-  // colorWipe(strip.Color(GREEN), 1);
+  colorWipe(strip.Color(GREEN), 1);
   // delay(100);
   // colorWipe(strip.Color(0, 0, 0), 1);
   // delay(100);

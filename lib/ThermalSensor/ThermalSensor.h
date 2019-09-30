@@ -39,7 +39,7 @@ public:
     void print();
     bool victim[THERMAL_NUM] = {false};
     float value[THERMAL_NUM] = {0};
-    bool spotHeat(int sensor, int heat);
+    bool spotHeat(int heat);
 private:
     void calibrate();
     float threshold[THERMAL_NUM] = {0};
