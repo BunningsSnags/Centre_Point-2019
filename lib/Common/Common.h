@@ -69,7 +69,16 @@
 // Motor
 #define SPEED 150
 
-#define USE_LRF_CORRECTION false
+// ==== Debug and functions =====
+// LEDS
+
+// Debug
+#define dLrfs 1
+#define dLight 2
+#define dTherm 3
+#define dImu 4
+#define dCorrect 5
+#define dWall 6
 
 
 struct Coordinate {
