@@ -11,8 +11,10 @@
 #ifdef __AVR__
   #include <avr/power.h>
 #endif
+#include <Thermal.h>
 
 // ============ Setups ============
+Thermal thermal;
 LRFs lrfs;
 MotorController motors;
 LightSensor light;
@@ -245,50 +247,53 @@ void setup() {
 
 void loop() {
   update();
-  debug(dTherm);
+  // debug(dTherm);
   receive();
 
+  thermal.readObjectTempC();
+  // Serial.println(thermal.readObjectTempC());
+
   // ------------ Main ------------
-  // if(!therm.spotHeat(30)) {
-    if(lrfs.average(0, 1) > 100) {
-        motors.update(SPEED, SPEED, IMUCorrection);
-        // colorWipe(strip.Color(BLUE), 1);
-        }
-        else {
-          if(lrfs.average(2, 4) > lrfs.average(3, 5)) {
-            // colorWipe(strip.Color(RED), 1);
-            direction = mod(direction + 90, 360);
-            IMUCorrection = round(IMUPID.update(imu.horizontalHeading, direction, 0));
-            while(!motors.setOrientation(IMUCorrection)) {
-              update();
-              }
-            }
-            else if(lrfs.average(3, 5) > lrfs.average(2, 4)) {
-              // colorWipe(strip.Color(GREEN), 1);
-              direction = mod(direction - 90, 360);
-              IMUCorrection = round(IMUPID.update(imu.horizontalHeading, direction, 0));
-              while(!motors.setOrientation(IMUCorrection)) {
-                update();
-            }
-          }
-        }
-      // }
-  // else {
-  //   update();
-  //   motors.update(0, 0, IMUCorrection);
-  //   colorWipe(strip.Color(GREEN), 1);
-  //   delay(100);
-  //   colorWipe(strip.Color(0, 0, 0), 1);
-  //   delay(100);
-  //   colorWipe(strip.Color(GREEN), 1);
-  //   delay(100);
-  //   colorWipe(strip.Color(0, 0, 0), 1);
-  //   delay(100);
-  //   colorWipe(strip.Color(GREEN), 1);
-  //   delay(100);
-  //   colorWipe(strip.Color(0, 0, 0), 1);
-  //   delay(100);
-  //   !therm.spotHeat(30);
-  //   therm.value[0] = 0;
-  // }
+  // // if(!therm.spotHeat(30)) {
+  //   if(lrfs.average(0, 1) > 100) {
+  //       motors.update(SPEED, SPEED, IMUCorrection);
+  //       // colorWipe(strip.Color(BLUE), 1);
+  //       }
+  //       else {
+  //         if(lrfs.average(2, 4) > lrfs.average(3, 5)) {
+  //           // colorWipe(strip.Color(RED), 1);
+  //           direction = mod(direction + 90, 360);
+  //           IMUCorrection = round(IMUPID.update(imu.horizontalHeading, direction, 0));
+  //           while(!motors.setOrientation(IMUCorrection)) {
+  //             update();
+  //             }
+  //           }
+  //           else if(lrfs.average(3, 5) > lrfs.average(2, 4)) {
+  //             // colorWipe(strip.Color(GREEN), 1);
+  //             direction = mod(direction - 90, 360);
+  //             IMUCorrection = round(IMUPID.update(imu.horizontalHeading, direction, 0));
+  //             while(!motors.setOrientation(IMUCorrection)) {
+  //               update();
+  //           }
+  //         }
+  //       }
+  //     // }
+  // // else {
+  // //   update();
+  // //   motors.update(0, 0, IMUCorrection);
+  // //   colorWipe(strip.Color(GREEN), 1);
+  // //   delay(100);
+  // //   colorWipe(strip.Color(0, 0, 0), 1);
+  // //   delay(100);
+  // //   colorWipe(strip.Color(GREEN), 1);
+  // //   delay(100);
+  // //   colorWipe(strip.Color(0, 0, 0), 1);
+  // //   delay(100);
+  // //   colorWipe(strip.Color(GREEN), 1);
+  // //   delay(100);
+  // //   colorWipe(strip.Color(0, 0, 0), 1);
+  // //   delay(100);
+  // //   !therm.spotHeat(30);
+  // //   therm.value[0] = 0;
+  // // }
 }
