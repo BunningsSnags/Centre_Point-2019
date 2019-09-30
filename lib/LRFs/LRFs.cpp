@@ -15,8 +15,8 @@ uint16_t LRFs::average(int lrf1, int lrf2) {
 }
 
 uint16_t LRFs::wallAverage(int lrf1, int lrf2, double heading) {
-    int sensor1 = value[lrf1] * cos(heading * PI/180);
-    int sensor2 = value[lrf2] * cos(heading * PI/180);
+    int sensor1 = value[lrf1] * abs(cos(heading * PI/180));
+    int sensor2 = value[lrf2] * abs(cos(heading * PI/180));
     uint16_t averaged = (sensor1 + sensor2)/2;
     return averaged;
 }

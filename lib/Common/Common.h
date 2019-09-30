@@ -48,8 +48,8 @@
 
 
 //MPU
-#define MPU_CALIBRATION_COUNT 20
-#define MPU_CALIBRATION_TIME 50
+#define MPU_CALIBRATION_COUNT 40
+#define MPU_CALIBRATION_TIME 100
 #define MPU9250_ADDRESS 0x68
 #define MAG_ADDRESS 0x0C
 #define GYRO_FULL_SCALE_250_DPS 0x00
@@ -68,6 +68,8 @@
 
 // Motor
 #define SPEED 150
+
+#define USE_LRF_CORRECTION false
 
 
 struct Coordinate {
