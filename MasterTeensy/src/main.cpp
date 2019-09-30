@@ -80,7 +80,12 @@ void lightPrint() {
 }
 // Thermal
 void thermalPrint() {
-  Serial.println(therm.victim[4]);
+  for(int i = 0; i < 4; i++) {
+        Serial.print(therm.value[i]);
+        Serial.print("\t");
+    }
+    Serial.println("Front, Left, Right, Back");
+}
 }
 // IMU
 void imuPrint() {
@@ -244,7 +249,7 @@ void setup() {
 
 void loop() {
   update();
-  debug(3);
+  debug(dTherm);
   receive();
 
   // ------------ Main ------------
