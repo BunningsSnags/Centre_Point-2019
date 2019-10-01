@@ -251,28 +251,30 @@ void loop() {
   // ------------ Main ------------
   // if(!therm.spotHeat(30)) {
     if(lrfs.average(0, 1) > 100) {
-        motors.update(SPEED, SPEED, IMUCorrection);
-        // colorWipe(strip.Color(BLUE), 1);
-        }
-        else {
-          if(lrfs.average(2, 4) > lrfs.average(3, 5)) {
-            // colorWipe(strip.Color(RED), 1);
-            direction = mod(direction + 90, 360);
-            IMUCorrection = round(IMUPID.update(imu.horizontalHeading, direction, 0));
-            while(!motors.setOrientation(IMUCorrection)) {
-              update();
-              }
-            }
-            else if(lrfs.average(3, 5) > lrfs.average(2, 4)) {
-              // colorWipe(strip.Color(GREEN), 1);
-              direction = mod(direction - 90, 360);
-              IMUCorrection = round(IMUPID.update(imu.horizontalHeading, direction, 0));
-              while(!motors.setOrientation(IMUCorrection)) {
-                update();
-            }
+      motors.update(SPEED, SPEED, IMUCorrection);
+      // colorWipe(strip.Color(BLUE), 1);
+      if(light.spotBlack(10)) {
+
+      }
+    }
+    else {
+      if(lrfs.average(2, 4) > lrfs.average(3, 5)) {
+        // colorWipe(strip.Color(RED), 1);
+        direction = mod(direction + 90, 360);
+        IMUCorrection = round(IMUPID.update(imu.horizontalHeading, direction, 0));
+        while(!motors.setOrientation(IMUCorrection)) {
+          update();
           }
         }
-      // }
+        else if(lrfs.average(3, 5) > lrfs.average(2, 4)) {
+          // colorWipe(strip.Color(GREEN), 1);
+          direction = mod(direction - 90, 360);
+          IMUCorrection = round(IMUPID.update(imu.horizontalHeading, direction, 0));
+          while(!motors.setOrientation(IMUCorrection)) {
+            update();
+        }
+      }
+    }
   // else {
   //   update();
   //   motors.update(0, 0, IMUCorrection);
