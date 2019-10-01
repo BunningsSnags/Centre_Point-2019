@@ -254,7 +254,8 @@ void loop() {
       motors.update(SPEED, SPEED, IMUCorrection);
       // colorWipe(strip.Color(BLUE), 1);
       if(light.spotBlack(10)) {
-
+        motors.update(0, 0, IMUCorrection);
+        // avoidTile()
       }
     }
     else {

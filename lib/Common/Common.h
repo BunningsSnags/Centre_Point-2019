@@ -11,7 +11,12 @@
 #define TEENSY_BAUD_RATE 9600
 #define MASTER_BLINK 1000
 #define SLAVE_BLINK 500
-
+#define dLrfs 1
+#define dLight 2
+#define dTherm 3
+#define dImu 4
+#define dCorrect 5
+#define dWall 6
 
 // Communications
 #define SLAVE_PACKET_SIZE 10
@@ -22,6 +27,11 @@
 #define LRF_BAUD_RATE 9600
 #define LRF_NUM 8
 #define LRF_PACKET_SIZE 8
+// Walls
+#define LEFT 0
+#define RIGHT 1
+#define FRONT 2
+#define BACK 3
 
 
 // Tile Spacing
@@ -68,17 +78,6 @@
 
 // Motor
 #define SPEED 150
-
-// ==== Debug and functions =====
-// LEDS
-
-// Debug
-#define dLrfs 1
-#define dLight 2
-#define dTherm 3
-#define dImu 4
-#define dCorrect 5
-#define dWall 6
 
 
 struct Coordinate {

@@ -1,5 +1,4 @@
 #include <LRFs.h>
-#include <MPU.h>
 #include <math.h>
 
 void LRFs::init() {
@@ -19,6 +18,40 @@ uint16_t LRFs::wallAverage(int lrf1, int lrf2, double heading) {
     int sensor2 = value[lrf2] * abs(cos(heading * PI/180));
     uint16_t averaged = (sensor1 + sensor2)/2;
     return averaged;
+}
+
+int walls[4] = {LEFT, RIGHT, FRONT, BACK};
+
+bool LRFs::checkTile() {
+    // Left
+    if(average(2, 4) < 100) {
+        walls[0] = true;
+    }
+    else {
+        walls[0] = false;
+    }
+    // Right
+    if(average(3, 5) < 100) {
+        walls[1] = true;
+    }
+    else {
+        walls[1] = false;
+    }
+    // Front
+    if(average(0, 1) < 100) {
+        walls[2] = true;
+    }
+    else {
+        walls[2] = false;
+    }
+    // Back
+    if(average(6, 7) < 100) {
+        walls[3] = true;
+    }
+    else {
+        walls[3] = false;
+    }
+    
 }
 
 void LRFs::update() {
