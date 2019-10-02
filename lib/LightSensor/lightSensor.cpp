@@ -10,13 +10,15 @@ void LightSensor::update() {
     light[2] = analogRead(BACK_LIGHT);
 }
 
-bool LightSensor::spotBlack(int darkness) {
+Tile LightSensor::spotBlack(int darkness, Tile tile) {
     for(int i = 0; i < 3; i++) {
         if(light[i] < darkness) {
-            return true;
+            tile.isBlack = true;
+            return tile;
         }
         else {
-            return false;
+            tile.isBlack = false;
+            return tile;
         }
     }
 }

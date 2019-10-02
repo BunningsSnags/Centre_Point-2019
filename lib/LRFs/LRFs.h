@@ -11,7 +11,7 @@ public:
     uint16_t wallAverage(int lrf1, int lrf2, double header);
     uint16_t average(int lrf1, int lrf2);
     uint16_t value[LRF_NUM] = {0};
-    bool checkTile();
+    Tile checkTile(Tile tile, double heading);
 private:
     uint16_t averaged = 0;
 };

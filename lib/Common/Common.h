@@ -3,6 +3,7 @@
 
 #include <Pins.h>
 #include <Colours.h>
+#include <Tile.h>
 #include <Arduino.h>
 
 

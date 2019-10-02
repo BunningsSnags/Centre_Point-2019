@@ -20,45 +20,38 @@ uint16_t LRFs::wallAverage(int lrf1, int lrf2, double heading) {
     return averaged;
 }
 
-bool walls[4] = {LEFT, RIGHT, FRONT, BACK};
+// bool walls[4] = {LEFT, RIGHT, FRONT, BACK};
 
-bool LRFs::checkTile() {
+Tile LRFs::checkTile(Tile tile, double heading) {
     // Left
-    if(average(2, 4) < 100) {
-        walls[0] = true;
-        return walls[0];
+    if(wallAverage(2, 4, heading) < 100) {
+        tile.walls[tile.north] = true;
     }
     else {
-        walls[0] = false;
-        return walls[0];
+        tile.walls[tile.north] = false;
     }
     // Right
-    if(average(3, 5) < 100) {
-        walls[1] = true;
-        return walls[1];
+    if(wallAverage(3, 5, heading) < 100) {
+        tile.walls[tile.east] = true;
     }
     else {
-        walls[1] = false;
-        return walls[1];
+        tile.walls[tile.east] = true;
     }
     // Front
-    if(average(0, 1) < 100) {
-        walls[2] = true;
-        return walls[2];
+    if(wallAverage(0, 1, heading) < 100) {
+        tile.walls[tile.south] = true;
     }
     else {
-        walls[2] = false;
-        return walls[2];
+        tile.walls[tile.south] = false;
     }
     // Back
-    if(average(6, 7) < 100) {
-        walls[3] = true;
-        return walls[3];
+    if(wallAverage(6, 7, heading) < 100) {
+        tile.walls[tile.west] = true;
     }
     else {
-        walls[3] = false;
-        return walls[3];
+        tile.walls[tile.west] = false;
     } 
+    return tile;
 }
 
 void LRFs::update() {

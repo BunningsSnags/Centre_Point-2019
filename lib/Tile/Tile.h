@@ -8,6 +8,11 @@ struct Tile {
     int thermal;
     bool isBlack;
     bool isSilver;
+    bool isRampUp;
+    bool isRampDown;
+    bool isExplored;
+    int pos[2];
+    int floorNum;
 };
 
 #endif

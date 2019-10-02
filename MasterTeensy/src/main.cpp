@@ -106,7 +106,6 @@ void correctionPrint() {
   Serial.print("\t");
   Serial.println("IMU, LRF");
 }
-
 void wallPrint() {
   Serial.print(lrfInput());
   Serial.print("\t");
@@ -256,11 +255,13 @@ void setup() {
 
 void loop() {
   update();
-  debug(dTherm);
-  receive();
-
-  // ------------ Main ------------
-  light.spotBlack(10);
+  // debug(dTherm);
+  receive();  
+  
+  // ------------ Navigate ------------
+  lrfs.checkTile(curTile, imu.horizontalHeading);
+  Serial.printf("North, East, South, West: %d\n, %d\n, %d\n, %d\n", curTile.walls[curTile.north], curTile.walls[curTile.east], curTile.walls[curTile.south], curTile.walls[curTile.west]);
+  // light.spotBlack(10, curTile);
   // if(!therm.spotHeat(30)) {
     // if(lrfs.average(0, 1) > 100) {
     //   motors.update(SPEED, SPEED, IMUCorrection);
