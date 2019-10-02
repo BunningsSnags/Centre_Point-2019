@@ -9,3 +9,14 @@ void LightSensor::update() {
     light[1] = analogRead(FRONT_RIGHT_LIGHT);
     light[2] = analogRead(BACK_LIGHT);
 }
+
+bool LightSensor::spotBlack(int darkness) {
+    for(int i = 0; i < 3; i++) {
+        if(light[i] < darkness) {
+            return true;
+        }
+        else {
+            return false;
+        }
+    }
+}
