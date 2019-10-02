@@ -10,6 +10,10 @@ void MotorController::init() {
     pinMode(RIGHT_INTWO, OUTPUT);
 }
 
+// void avoidTile() {
+    
+// }
+
 void MotorController::update(int16_t left, int16_t right, int16_t rotation) {
 
     // Serial.printf("Left: %d - %d = %d\n", left, rotation, left - rotation);
