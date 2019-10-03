@@ -23,29 +23,29 @@ uint16_t LRFs::wallAverage(int lrf1, int lrf2, double heading) {
 // bool walls[4] = {LEFT, RIGHT, FRONT, BACK};
 
 Tile LRFs::checkTile(Tile tile, double heading) {
-    // Left
-    if(wallAverage(2, 4, heading) < 100) {
+    // North
+    if(wallAverage(0, 1, heading) < DISTANCE_TO_WALL) {
         tile.walls[tile.north] = true;
     }
     else {
         tile.walls[tile.north] = false;
     }
-    // Right
-    if(wallAverage(3, 5, heading) < 100) {
+    // East
+    if(wallAverage(3, 5, heading) < DISTANCE_TO_WALL) {
         tile.walls[tile.east] = true;
     }
     else {
-        tile.walls[tile.east] = true;
+        tile.walls[tile.east] = false;
     }
-    // Front
-    if(wallAverage(0, 1, heading) < 100) {
+    // South
+    if(value[7] < DISTANCE_TO_WALL) {
         tile.walls[tile.south] = true;
     }
     else {
         tile.walls[tile.south] = false;
     }
-    // Back
-    if(wallAverage(6, 7, heading) < 100) {
+    // West
+    if(wallAverage(2, 4, heading) < DISTANCE_TO_WALL){
         tile.walls[tile.west] = true;
     }
     else {

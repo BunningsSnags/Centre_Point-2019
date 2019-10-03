@@ -9,6 +9,7 @@
 #include <PID.h>
 #include <ThermalSensor.h>
 #include <Tile.h>
+#include <Tracker.h>
 #ifdef __AVR__
   #include <avr/power.h>
 #endif
@@ -27,12 +28,12 @@ PID IMUPID = PID(15, 0, 0, 255*2);
 PID LRFPID = PID(1, 0, -1.5, 255*2);
 ThermalSensor therm;
 Adafruit_NeoPixel strip(NUM_RGB_LEDS, RGB_PIN, NEO_GRB + NEO_KHZ800);
+Tile curTile;
+Tracker track;
 // Corrections
 double IMUCorrection;
 double LRFCorrection;
 double direction = 0;
-
-Tile curTile;
 
 // ------------ Timers ------------
 Timer ledTimer(MASTER_BLINK);
@@ -42,6 +43,18 @@ void masterFlash() {
         digitalWrite(MASTER_LED, ledOn);
         ledOn = !ledOn;
     }
+}
+
+int createMaze(int rows, int collums) {
+  int maze[rows][collums];
+  for(int i = 0; i < rows; i++) {
+        for(int j = 0; j < collums; j++) {
+          Serial.printf("%d, %d", i, j);
+          Serial.print(" | ");
+        }
+        Serial.println();
+    }
+    return maze[rows][collums];
 }
 
 // ============ Slave Teensy ============
@@ -228,6 +241,13 @@ void update() {
   receive();
   IMUCorrection = round(IMUPID.update(imu.horizontalHeading, direction, 0));
   LRFCorrection = constrain(round(LRFPID.update(lrfInput(), 0, 0)), -300, 300);
+  // direction = mod(round((imu.horizontalHeading/90)), 4);
+}
+
+void tileCheck() {
+  curTile = lrfs.checkTile(curTile, imu.horizontalHeading);
+  curTile = light.spotBlack(400, curTile);
+  curTile = light.spotSilver(200, curTile);
 }
 
 // ============ Setup ============
@@ -251,31 +271,39 @@ void setup() {
   strip.show();
   temp.begin();
   temp.setUnit(TEMP_C);
+  createMaze(10, 10);
 }
 
 void loop() {
-  update();
-  // debug(dTherm);
-  receive();  
-  
+    // track.createMaze(5, 5);
+    // Serial.println();
+    // Serial.println("=========================");
+    // Serial.println();
+  // update();
+  // debug(dImu);
+  // receive();
+  // tileCheck();
+
+  // Serial.println(maze)
+
   // ------------ Navigate ------------
-  lrfs.checkTile(curTile, imu.horizontalHeading);
-  Serial.printf("North, East, South, West: %d\n, %d\n, %d\n, %d\n", curTile.walls[curTile.north], curTile.walls[curTile.east], curTile.walls[curTile.south], curTile.walls[curTile.west]);
-  // light.spotBlack(10, curTile);
   // if(!therm.spotHeat(30)) {
-    // if(lrfs.average(0, 1) > 100) {
+    // if(lrfs.wallAverage(0, 1, imu.horizontalHeading) < 120 /*curTile.walls[round(objDirection)] == false*/) {
     //   motors.update(SPEED, SPEED, IMUCorrection);
     //   // colorWipe(strip.Color(BLUE), 1);
-    //   if(light.spotBlack(10)) {
-    //     motors.update(0, 0, IMUCorrection);
-    //     // avoidTile()
-    //   }
+    //   // if(light.spotBlack(400, curTile)) {
+    //   //   // We are on black
+    //   //   motors.update(0, 0, IMUCorrection);
+    //   //   tileCheck();
+    //   //   curTile = motors.avoidTile(curTile, direction);
+    //   //   // avoidTile()
+    //   // }
     // }
     // else {
     //   if(lrfs.average(2, 4) > lrfs.average(3, 5)) {
     //     // colorWipe(strip.Color(RED), 1);
     //     direction = mod(direction + 90, 360);
-    //     IMUCorrection = round(IMUPID.update(imu.horizontalHeading, direction, 0));
+    //     IMUCorrection = round(IMUPID.update(imu.horizontalHeading, direction, 4));
     //     while(!motors.setOrientation(IMUCorrection)) {
     //       update();
     //       }
@@ -283,7 +311,7 @@ void loop() {
     //     else if(lrfs.average(3, 5) > lrfs.average(2, 4)) {
     //       // colorWipe(strip.Color(GREEN), 1);
     //       direction = mod(direction - 90, 360);
-    //       IMUCorrection = round(IMUPID.update(imu.horizontalHeading, direction, 0));
+    //       IMUCorrection = round(IMUPID.update(imu.horizontalHeading, direction, 4));
     //       while(!motors.setOrientation(IMUCorrection)) {
     //         update();
     //     }

@@ -29,10 +29,7 @@
 #define LRF_NUM 8
 #define LRF_PACKET_SIZE 8
 // Walls
-#define LEFT 0
-#define RIGHT 1
-#define FRONT 2
-#define BACK 3
+#define DISTANCE_TO_WALL 140
 
 
 // Tile Spacing

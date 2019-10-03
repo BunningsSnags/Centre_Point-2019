@@ -10,10 +10,6 @@ void MotorController::init() {
     pinMode(RIGHT_INTWO, OUTPUT);
 }
 
-// void avoidTile() {
-    
-// }
-
 void MotorController::update(int16_t left, int16_t right, int16_t rotation) {
 
     // Serial.printf("Left: %d - %d = %d\n", left, rotation, left - rotation);
@@ -68,3 +64,14 @@ bool MotorController::setOrientation(int ofSet) {
         return false;
     }
 }
+
+// void avoidTile(Tile currentTile, int16_t heading) {
+//     // Move backwards
+//     update(0, 0, 0);
+//     update(-100, -100, 0);
+
+//     // Mark tile as wall
+//     // bool black = floor(heading / 4);
+//     currentTile.isBlack = true;
+//     return currentTile;
+// }

@@ -12,12 +12,25 @@ void LightSensor::update() {
 
 Tile LightSensor::spotBlack(int darkness, Tile tile) {
     for(int i = 0; i < 3; i++) {
-        if(light[i] < darkness) {
+        if(light[i] > darkness) {
             tile.isBlack = true;
             return tile;
         }
         else {
             tile.isBlack = false;
+            return tile;
+        }
+    }
+}
+
+Tile LightSensor::spotSilver(int brightness, Tile tile) {
+    for(int i = 0; i < 3; i++) {
+        if(light[i] < brightness) {
+            tile.isSilver = true;
+            return tile;
+        }
+        else {
+            tile.isSilver = false;
             return tile;
         }
     }

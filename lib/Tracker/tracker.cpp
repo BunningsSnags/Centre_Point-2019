@@ -1,7 +1,13 @@
-#include <arduino.h>
+#include <Tracker.h>
 
-int direction = 0;
-int north = 0;
-int east = 90;
-int south = 180;
-int west = 270;
+int createMaze(int rows, int collums) {
+  int maze[rows][collums];
+  for(int i = 0; i < rows; i++) {
+        for(int j = 0; j < collums; j++) {
+          Serial.printf("%d, %d", i, j);
+          Serial.print(" | ");
+        }
+        Serial.println();
+    }
+    return maze[rows][collums];
+}
