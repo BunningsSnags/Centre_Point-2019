@@ -5,6 +5,9 @@
 class Tracker {
 public:
     int createMaze(int rows, int collums);
+    int tileMove();
+private:
+    // int start;
 };
 
 #endif

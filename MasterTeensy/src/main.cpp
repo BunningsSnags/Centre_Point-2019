@@ -5,33 +5,35 @@
 #include <LightSensor.h>
 #include <SPI.h>
 #include <Adafruit_NeoPixel.h>
-#include <MPU.h>
+// #include <MPU.h>
 #include <PID.h>
-#include <ThermalSensor.h>
+// #include <ThermalSensor.h>
+#include <Thermal.h>
 #include <Tile.h>
 #include <Tracker.h>
 #ifdef __AVR__
   #include <avr/power.h>
 #endif
 
-#include <SparkFunMLX90614.h>
-#include <wire.h>
+// #include <SparkFunMLX90614.h>
+// #include <wire.h>
 
-IRTherm temp;
+// IRTherm temp;
 
 // ============ Setups ============
 LRFs lrfs;
 MotorController motors;
 LightSensor light;
-MPU imu;
-PID IMUPID = PID(15, 0, 0, 255*2);
+// MPU imu;
+// PID IMUPID = PID(15, 0, 0, 255*2);
 PID LRFPID = PID(1, 0, -1.5, 255*2);
-ThermalSensor therm;
+// ThermalSensor therm;
 Adafruit_NeoPixel strip(NUM_RGB_LEDS, RGB_PIN, NEO_GRB + NEO_KHZ800);
 Tile curTile;
 Tracker track;
+Thermal therms;
 // Corrections
-double IMUCorrection;
+// double IMUCorrection;
 double LRFCorrection;
 double direction = 0;
 
@@ -43,18 +45,6 @@ void masterFlash() {
         digitalWrite(MASTER_LED, ledOn);
         ledOn = !ledOn;
     }
-}
-
-int createMaze(int rows, int collums) {
-  int maze[rows][collums];
-  for(int i = 0; i < rows; i++) {
-        for(int j = 0; j < collums; j++) {
-          Serial.printf("%d, %d", i, j);
-          Serial.print(" | ");
-        }
-        Serial.println();
-    }
-    return maze[rows][collums];
 }
 
 // ============ Slave Teensy ============
@@ -72,17 +62,17 @@ void receive() {
             lrfs.value[5] = buffer[2] << 8 | buffer[3];
             lrfs.value[6] = buffer[4] << 8 | buffer[5];
             lrfs.value[7] = buffer[6] << 8 | buffer[7];
-            therm.victim[2] = buffer[8] == 0 ? false : true;
-            therm.victim[3] = buffer[9] == 0 ? false : true;
+            // therm.victim[2] = buffer[8] == 0 ? false : true;
+            // therm.victim[3] = buffer[9] == 0 ? false : true;
         }
     }
 }
 
 int lrfInput() {
-  int leftSide = lrfs.wallAverage(2, 4, imu.horizontalHeading);
-  int rightSide = lrfs.wallAverage(3, 5, imu.horizontalHeading);
-  int16_t input = leftSide-rightSide;
-  return input;
+  // int leftSide = lrfs.wallAverage(2, 4, imu.horizontalHeading);
+  // int rightSide = lrfs.wallAverage(3, 5, imu.horizontalHeading);
+  // int16_t input = leftSide-rightSide;
+  // return input;
 }
 
 // ============ Debugers ==========````````````````````````````````````````````````````````````````````````````````````````
@@ -99,21 +89,22 @@ void lightPrint() {
     }
 }
 void thermalPrint() {
-  for(int i = 0; i < 4; i++) {
-        Serial.print(therm.value[i]);
-        Serial.print("\t");
-    }
-    Serial.printf("Front, Left, Right, Back, Spotted: %d\n", therm.spotHeat(30));
+  Serial.println(therms.readObjectTempC());
+  // for(int i = 0; i < 4; i++) {
+        // Serial.print(therm.value[i]);
+        // Serial.print("\t");
+    // }
+    // Serial.printf("Front, Left, Right, Back, Spotted: %d\n", therm.spotHeat(30));
 }
 void imuPrint() {
-  Serial.print(imu.horizontalHeading);
+  // Serial.print(imu.horizontalHeading);
   Serial.print("\t");
-  Serial.print(imu.verticalHeading);
+  // Serial.print(imu.verticalHeading);
   Serial.print("\t");
   Serial.println("Horizontal, Vertical");
 }
 void correctionPrint() {
-  Serial.print(IMUCorrection);
+  // Serial.print(IMUCorrection);
   Serial.print("\t");
   Serial.print(LRFCorrection);
   Serial.print("\t");
@@ -233,19 +224,20 @@ void theaterChaseRainbow(uint8_t wait) {
 
 // ============ updates ============
 void update() {
-  imu.update();
+  // imu.update();
   light.update();
   lrfs.update();
-  therm.update();
+  // therm.update();
+  // therms.readObjectTempC();
   masterFlash();
   receive();
-  IMUCorrection = round(IMUPID.update(imu.horizontalHeading, direction, 0));
+  // IMUCorrection = round(IMUPID.update(imu.horizontalHeading, direction, 0));
   LRFCorrection = constrain(round(LRFPID.update(lrfInput(), 0, 0)), -300, 300);
   // direction = mod(round((imu.horizontalHeading/90)), 4);
 }
 
 void tileCheck() {
-  curTile = lrfs.checkTile(curTile, imu.horizontalHeading);
+  // curTile = lrfs.checkTile(curTile, imu.horizontalHeading);
   curTile = light.spotBlack(400, curTile);
   curTile = light.spotSilver(200, curTile);
 }
@@ -259,32 +251,74 @@ void setup() {
   lrfs.init();
   light.init();
   motors.init();
-  therm.init();
+  // therm.init();
   pinMode(MASTER_LED, OUTPUT);
   Serial.begin(9600);
-  imu.init();
+  // imu.init();
   #if defined (__AVR_ATtiny85__)
   if (F_CPU == 16000000) clock_prescale_set(clock_div_1);
   #endif
   strip.begin();
   strip.setBrightness(20);
   strip.show();
-  temp.begin();
-  temp.setUnit(TEMP_C);
-  createMaze(10, 10);
+  // track.createMaze(mSize, mSize);
+  therms.begin();
+}
+
+static void i2c_scanner(i2c_t3 wire){
+  byte error, address;
+  int nDevices;
+
+  Serial.println("Scanning...");
+
+  nDevices = 0;
+  for(address = 1; address < 127; address++ ) 
+  {
+    // The i2c_scanner uses the return value of
+    // the Write.endTransmisstion to see if
+    // a device did acknowledge to the address.
+    wire.beginTransmission(address);
+    error = wire.endTransmission();
+
+    if (error == 0)
+    {
+      Serial.print("I2C device found at address 0x");
+      if (address<16) 
+        Serial.print("0");
+      Serial.print(address,HEX);
+      Serial.println("  !");
+
+      nDevices++;
+    }
+    else if (error==4) 
+    {
+      Serial.print("Unknow error at address 0x");
+      if (address<16) 
+        Serial.print("0");
+      Serial.println(address,HEX);
+    }    
+  }
+  if (nDevices == 0)
+    Serial.println("No I2C devices found\n");
+  else
+    Serial.println("done\n");
+
+  // delay(5000);           // wait 5 seconds for next scan
 }
 
 void loop() {
-    // track.createMaze(5, 5);
-    // Serial.println();
-    // Serial.println("=========================");
-    // Serial.println();
-  // update();
-  // debug(dImu);
-  // receive();
+  update();
+  // debug(dTherm);
+  receive();
+  // Serial.printf("Read object: %d\n", therms.readObjectTempC());
   // tileCheck();
 
-  // Serial.println(maze)
+  // Serial.println("bus 0");
+  // i2c_scanner(Wire);
+  Serial.println("bus 1");
+  i2c_scanner(Wire1);
+  Serial.println("bus 2");
+  i2c_scanner(Wire2);
 
   // ------------ Navigate ------------
   // if(!therm.spotHeat(30)) {

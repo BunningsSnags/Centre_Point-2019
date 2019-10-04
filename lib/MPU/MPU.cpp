@@ -1,7 +1,7 @@
 #include "MPU.h"
 
 void MPU::init() {
-    Wire.begin();
+    Wire.begin(I2C_MASTER, 0x00, 19, 18);
     I2CwriteByte(MPU9250_ADDRESS, 29, 0x06);
     I2CwriteByte(MPU9250_ADDRESS, 26, 0x06);
     I2CwriteByte(MPU9250_ADDRESS, 27, GYRO_FULL_SCALE_1000_DPS);
