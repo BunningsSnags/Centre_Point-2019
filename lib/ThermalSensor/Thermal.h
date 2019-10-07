@@ -5,7 +5,7 @@
 class Thermal  {
  public:
   Thermal(uint8_t dr = MLX90614_I2CADDR);
-  boolean begin();
+  void init();
   uint32_t readID(void);
 
   double readObjectTempC(void);

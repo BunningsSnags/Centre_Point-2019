@@ -65,7 +65,7 @@ bool MotorController::setOrientation(int ofSet) {
     }
 }
 
-// void avoidTile(Tile currentTile, int16_t heading) {
+// void avoidTile(Tile currentTile, bool durection) {
 //     // Move backwards
 //     update(0, 0, 0);
 //     update(-100, -100, 0);

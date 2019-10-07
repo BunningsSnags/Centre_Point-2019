@@ -5,9 +5,8 @@
 #include <LightSensor.h>
 #include <SPI.h>
 #include <Adafruit_NeoPixel.h>
-// #include <MPU.h>
+#include <MPU.h>
 #include <PID.h>
-// #include <ThermalSensor.h>
 #include <Thermal.h>
 #include <Tile.h>
 #include <Tracker.h>
@@ -24,18 +23,18 @@
 LRFs lrfs;
 MotorController motors;
 LightSensor light;
-// MPU imu;
-// PID IMUPID = PID(15, 0, 0, 255*2);
+MPU imu;
+PID IMUPID = PID(15, 0, 0, 255*2);
 PID LRFPID = PID(1, 0, -1.5, 255*2);
-// ThermalSensor therm;
 Adafruit_NeoPixel strip(NUM_RGB_LEDS, RGB_PIN, NEO_GRB + NEO_KHZ800);
 Tile curTile;
 Tracker track;
 Thermal therms;
 // Corrections
-// double IMUCorrection;
+double IMUCorrection;
 double LRFCorrection;
 double direction = 0;
+// int objDirection = 0;
 
 // ------------ Timers ------------
 Timer ledTimer(MASTER_BLINK);
@@ -69,10 +68,10 @@ void receive() {
 }
 
 int lrfInput() {
-  // int leftSide = lrfs.wallAverage(2, 4, imu.horizontalHeading);
-  // int rightSide = lrfs.wallAverage(3, 5, imu.horizontalHeading);
-  // int16_t input = leftSide-rightSide;
-  // return input;
+  int leftSide = lrfs.wallAverage(2, 4, imu.horizontalHeading);
+  int rightSide = lrfs.wallAverage(3, 5, imu.horizontalHeading);
+  int16_t input = leftSide-rightSide;
+  return input;
 }
 
 // ============ Debugers ==========````````````````````````````````````````````````````````````````````````````````````````
@@ -97,14 +96,14 @@ void thermalPrint() {
     // Serial.printf("Front, Left, Right, Back, Spotted: %d\n", therm.spotHeat(30));
 }
 void imuPrint() {
-  // Serial.print(imu.horizontalHeading);
+  Serial.print(imu.horizontalHeading);
   Serial.print("\t");
-  // Serial.print(imu.verticalHeading);
+  Serial.print(imu.verticalHeading);
   Serial.print("\t");
   Serial.println("Horizontal, Vertical");
 }
 void correctionPrint() {
-  // Serial.print(IMUCorrection);
+  Serial.print(IMUCorrection);
   Serial.print("\t");
   Serial.print(LRFCorrection);
   Serial.print("\t");
@@ -227,42 +226,37 @@ void update() {
   // imu.update();
   light.update();
   lrfs.update();
-  // therm.update();
-  // therms.readObjectTempC();
   masterFlash();
   receive();
-  // IMUCorrection = round(IMUPID.update(imu.horizontalHeading, direction, 0));
+  IMUCorrection = round(IMUPID.update(imu.horizontalHeading, direction, 0));
   LRFCorrection = constrain(round(LRFPID.update(lrfInput(), 0, 0)), -300, 300);
-  // direction = mod(round((imu.horizontalHeading/90)), 4);
+  direction = mod(round((imu.horizontalHeading/90)), 4);
 }
 
 void tileCheck() {
-  // curTile = lrfs.checkTile(curTile, imu.horizontalHeading);
+  curTile = lrfs.checkTile(curTile, imu.horizontalHeading);
   curTile = light.spotBlack(400, curTile);
   curTile = light.spotSilver(200, curTile);
 }
 
 // ============ Setup ============
 void setup() {
-  #if DEBUG
-      Serial.begin(TEENSY_BAUD_RATE);
-  #endif
+  Serial.begin(TEENSY_BAUD_RATE);
   Serial1.begin(TEENSY_BAUD_RATE);
   lrfs.init();
   light.init();
   motors.init();
-  // therm.init();
   pinMode(MASTER_LED, OUTPUT);
   Serial.begin(9600);
-  // imu.init();
+  imu.init();
   #if defined (__AVR_ATtiny85__)
   if (F_CPU == 16000000) clock_prescale_set(clock_div_1);
   #endif
   strip.begin();
   strip.setBrightness(20);
   strip.show();
+  // therms.init();
   // track.createMaze(mSize, mSize);
-  therms.begin();
 }
 
 static void i2c_scanner(i2c_t3 wire){
@@ -308,18 +302,21 @@ static void i2c_scanner(i2c_t3 wire){
 
 void loop() {
   update();
-  // debug(dTherm);
-  receive();
-  // Serial.printf("Read object: %d\n", therms.readObjectTempC());
+  debug(dTherm);
   // tileCheck();
+
+  // i2c_scanner(Wire);
 
   // Serial.println("bus 0");
   // i2c_scanner(Wire);
-  Serial.println("bus 1");
-  i2c_scanner(Wire1);
-  Serial.println("bus 2");
-  i2c_scanner(Wire2);
 
+  // colorWipe(strip.Color(BLUE), 1);
+  // if(curTile.walls[objDirection] == false) {
+  //   colorWipe(strip.Color(GREEN), 1);
+  // }
+  // else {
+  //   colorWipe(strip.Color(RED), 1);
+  // }
   // ------------ Navigate ------------
   // if(!therm.spotHeat(30)) {
     // if(lrfs.wallAverage(0, 1, imu.horizontalHeading) < 120 /*curTile.walls[round(objDirection)] == false*/) {

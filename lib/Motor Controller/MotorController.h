@@ -8,7 +8,7 @@ public:
     MotorController() {}
     void init();
     void update(int16_t left, int16_t right, int16_t rotation);
-    Tile avoidTile(Tile currentTile, int16_t heading);
+    Tile avoidTile(Tile currentTile, bool direction);
     bool setOrientation(int ofSet);
 };
 
