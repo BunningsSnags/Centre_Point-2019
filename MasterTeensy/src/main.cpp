@@ -7,17 +7,10 @@
 #include <Adafruit_NeoPixel.h>
 #include <MPU.h>
 #include <PID.h>
-#include <Thermal.h>
 #include <Tile.h>
-#include <Tracker.h>
 #ifdef __AVR__
   #include <avr/power.h>
 #endif
-
-// #include <SparkFunMLX90614.h>
-// #include <wire.h>
-
-// IRTherm temp;
 
 // ============ Setups ============
 LRFs lrfs;
@@ -27,14 +20,12 @@ MPU imu;
 PID IMUPID = PID(15, 0, 0, 255*2);
 PID LRFPID = PID(1, 0, -1.5, 255*2);
 Adafruit_NeoPixel strip(NUM_RGB_LEDS, RGB_PIN, NEO_GRB + NEO_KHZ800);
-Tile curTile;
-Tracker track;
-Thermal therms;
 // Corrections
 double IMUCorrection;
 double LRFCorrection;
 double direction = 0;
-// int objDirection = 0;
+
+Tile curTile;
 
 // ------------ Timers ------------
 Timer ledTimer(MASTER_BLINK);
@@ -61,8 +52,6 @@ void receive() {
             lrfs.value[5] = buffer[2] << 8 | buffer[3];
             lrfs.value[6] = buffer[4] << 8 | buffer[5];
             lrfs.value[7] = buffer[6] << 8 | buffer[7];
-            // therm.victim[2] = buffer[8] == 0 ? false : true;
-            // therm.victim[3] = buffer[9] == 0 ? false : true;
         }
     }
 }
@@ -88,7 +77,6 @@ void lightPrint() {
     }
 }
 void thermalPrint() {
-  Serial.println(therms.readObjectTempC());
   // for(int i = 0; i < 4; i++) {
         // Serial.print(therm.value[i]);
         // Serial.print("\t");
@@ -223,25 +211,20 @@ void theaterChaseRainbow(uint8_t wait) {
 
 // ============ updates ============
 void update() {
-  // imu.update();
+  imu.update();
   light.update();
   lrfs.update();
   masterFlash();
   receive();
   IMUCorrection = round(IMUPID.update(imu.horizontalHeading, direction, 0));
   LRFCorrection = constrain(round(LRFPID.update(lrfInput(), 0, 0)), -300, 300);
-  direction = mod(round((imu.horizontalHeading/90)), 4);
-}
-
-void tileCheck() {
-  curTile = lrfs.checkTile(curTile, imu.horizontalHeading);
-  curTile = light.spotBlack(400, curTile);
-  curTile = light.spotSilver(200, curTile);
 }
 
 // ============ Setup ============
 void setup() {
-  Serial.begin(TEENSY_BAUD_RATE);
+  #if DEBUG
+      Serial.begin(TEENSY_BAUD_RATE);
+  #endif
   Serial1.begin(TEENSY_BAUD_RATE);
   lrfs.init();
   light.init();
@@ -255,99 +238,41 @@ void setup() {
   strip.begin();
   strip.setBrightness(20);
   strip.show();
-  // therms.init();
-  // track.createMaze(mSize, mSize);
-}
-
-static void i2c_scanner(i2c_t3 wire){
-  byte error, address;
-  int nDevices;
-
-  Serial.println("Scanning...");
-
-  nDevices = 0;
-  for(address = 1; address < 127; address++ ) 
-  {
-    // The i2c_scanner uses the return value of
-    // the Write.endTransmisstion to see if
-    // a device did acknowledge to the address.
-    wire.beginTransmission(address);
-    error = wire.endTransmission();
-
-    if (error == 0)
-    {
-      Serial.print("I2C device found at address 0x");
-      if (address<16) 
-        Serial.print("0");
-      Serial.print(address,HEX);
-      Serial.println("  !");
-
-      nDevices++;
-    }
-    else if (error==4) 
-    {
-      Serial.print("Unknow error at address 0x");
-      if (address<16) 
-        Serial.print("0");
-      Serial.println(address,HEX);
-    }    
-  }
-  if (nDevices == 0)
-    Serial.println("No I2C devices found\n");
-  else
-    Serial.println("done\n");
-
-  // delay(5000);           // wait 5 seconds for next scan
 }
 
 void loop() {
   update();
-  debug(dTherm);
-  // tileCheck();
-
-  // i2c_scanner(Wire);
-
-  // Serial.println("bus 0");
-  // i2c_scanner(Wire);
-
-  // colorWipe(strip.Color(BLUE), 1);
-  // if(curTile.walls[objDirection] == false) {
-  //   colorWipe(strip.Color(GREEN), 1);
-  // }
-  // else {
-  //   colorWipe(strip.Color(RED), 1);
-  // }
+  debug(dImu);
+  receive();  
+  
   // ------------ Navigate ------------
   // if(!therm.spotHeat(30)) {
-    // if(lrfs.wallAverage(0, 1, imu.horizontalHeading) < 120 /*curTile.walls[round(objDirection)] == false*/) {
-    //   motors.update(SPEED, SPEED, IMUCorrection);
-    //   // colorWipe(strip.Color(BLUE), 1);
-    //   // if(light.spotBlack(400, curTile)) {
-    //   //   // We are on black
-    //   //   motors.update(0, 0, IMUCorrection);
-    //   //   tileCheck();
-    //   //   curTile = motors.avoidTile(curTile, direction);
-    //   //   // avoidTile()
-    //   // }
-    // }
-    // else {
-    //   if(lrfs.average(2, 4) > lrfs.average(3, 5)) {
-    //     // colorWipe(strip.Color(RED), 1);
-    //     direction = mod(direction + 90, 360);
-    //     IMUCorrection = round(IMUPID.update(imu.horizontalHeading, direction, 4));
-    //     while(!motors.setOrientation(IMUCorrection)) {
-    //       update();
-    //       }
-    //     }
-    //     else if(lrfs.average(3, 5) > lrfs.average(2, 4)) {
-    //       // colorWipe(strip.Color(GREEN), 1);
-    //       direction = mod(direction - 90, 360);
-    //       IMUCorrection = round(IMUPID.update(imu.horizontalHeading, direction, 4));
-    //       while(!motors.setOrientation(IMUCorrection)) {
-    //         update();
-    //     }
-    //   }
-    // }
+    if(lrfs.average(0, 1) > 100) {
+      motors.update(150, 150, IMUCorrection);
+      // colorWipe(strip.Color(BLUE), 1);
+      // if(light.spotBlack(10)) {
+      //   motors.update(0, 0, IMUCorrection);
+      //   // avoidTile()
+      // }
+    }
+    else {
+      if(lrfs.average(2, 4) > lrfs.average(3, 5)) {
+        // colorWipe(strip.Color(RED), 1);
+        direction = mod(direction + 90, 360);
+        IMUCorrection = round(IMUPID.update(imu.horizontalHeading, direction, 0));
+        while(!motors.setOrientation(IMUCorrection)) {
+          update();
+          }
+        }
+        else if(lrfs.average(3, 5) > lrfs.average(2, 4)) {
+          // colorWipe(strip.Color(GREEN), 1);
+          direction = mod(direction - 90, 360);
+          IMUCorrection = round(IMUPID.update(imu.horizontalHeading, direction, 0));
+          while(!motors.setOrientation(IMUCorrection)) {
+            update();
+        }
+      }
+    }
   // else {
   //   update();
   //   motors.update(0, 0, IMUCorrection);

@@ -1,9 +1,7 @@
 #include <LRFs.h>
-#include <ThermalSensor.h>
 #include <Timer.h>
 
 LRFs lrfs;
-ThermalSensor therm;
 Timer ledTimer(SLAVE_BLINK);
 
 bool ledOn = true;
