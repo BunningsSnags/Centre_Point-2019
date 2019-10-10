@@ -2,6 +2,7 @@
 #define ADAFRUIT_NEOPIXEL_H
 
 #include <Colours.h>
+#include <Tile.h>
 
 #ifdef ARDUINO
   #if (ARDUINO >= 100)

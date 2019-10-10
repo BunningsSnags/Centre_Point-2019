@@ -20,8 +20,11 @@ MPU imu;
 PID IMUPID = PID(15, 0, 0, 255*2);
 PID LRFPID = PID(1, 0, -1.5, 255*2);
 Adafruit_NeoPixel strip(NUM_RGB_LEDS, RGB_PIN, NEO_GRB + NEO_KHZ800);
-
 Tile curTile;
+double IMUCorrection;
+double LRFCorrection;
+double direction = 0;
+int objDirection = 0;
 
 // ------------ Timers ------------
 Timer ledTimer(MASTER_BLINK);
