@@ -68,11 +68,6 @@ void correctionPrint() {
   Serial.print("\t");
   Serial.println("IMU, LRF");
 }
-void wallPrint() {
-  Serial.print(lrfInput());
-  Serial.print("\t");
-  Serial.println("input");
-}
 // Debuging function
 void debug(int sensor) {
   if(sensor == 1) {
@@ -89,9 +84,6 @@ void debug(int sensor) {
   }
   if(sensor == 5) {
     correctionPrint();
-  }
-  if(sensor == 6) {
-    wallPrint();
   }
 }
 
@@ -206,10 +198,15 @@ void setup() {
   strip.show();
 }
 
+void updateMain() {
+  masterFlash();
+  receive();
+}
+
 void loop() {
   logic.update();
   debug(dLight);
-  receive();
+  updateMain();
   
   logic.Navigate();
 }

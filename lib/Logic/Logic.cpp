@@ -10,13 +10,13 @@ lrfInput is used to collect a certain value
 -------------------------------------------------------------------
 */
 
+#include <Logic.h>
+
 // ============ updates ============
 void Logic::update() {
   logic.imu.update();
   logic.light.update();
   logic.lrfs.update();
-  masterFlash();
-  receive();
   IMUCorrection = round(logic.IMUPID.update(logic.imu.horizontalHeading, direction, 0));
   LRFCorrection = constrain(round(logic.LRFPID.update(lrfInput(), 0, 0)), -300, 300);
 }
