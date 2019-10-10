@@ -24,6 +24,7 @@ Adafruit_NeoPixel strip(NUM_RGB_LEDS, RGB_PIN, NEO_GRB + NEO_KHZ800);
 double IMUCorrection;
 double LRFCorrection;
 double direction = 0;
+int objDirection = 0;
 
 Tile curTile;
 
@@ -73,8 +74,10 @@ void lrfsPrint() {
 }
 void lightPrint() {
     for(int i = 0; i < LIGHTSENSOR_NUM; i++) {
-        Serial.println(light.light[i]);
+        Serial.print(light.light[i]);
+        Serial.print("\n");
     }
+    Serial.println("Front1, Front2, Back");
 }
 void thermalPrint() {
   // for(int i = 0; i < 4; i++) {
@@ -220,6 +223,12 @@ void update() {
   LRFCorrection = constrain(round(LRFPID.update(lrfInput(), 0, 0)), -300, 300);
 }
 
+void tileCheck() {
+  curTile = lrfs.checkTile(curTile, imu.horizontalHeading);
+  // curTile = light.spotBlack(600, curTile);
+  // curTile = light.spotSilver(200, curTile);
+}
+
 // ============ Setup ============
 void setup() {
   #if DEBUG
@@ -242,19 +251,40 @@ void setup() {
 
 void loop() {
   update();
-  debug(dImu);
-  receive();  
+  debug(dLight);
+  receive();
   
   // ------------ Navigate ------------
   // if(!therm.spotHeat(30)) {
     if(lrfs.average(0, 1) > 100) {
       motors.update(150, 150, IMUCorrection);
       // colorWipe(strip.Color(BLUE), 1);
-      // if(light.spotBlack(10)) {
-      //   motors.update(0, 0, IMUCorrection);
-      //   // avoidTile()
-      // }
+
+      // light sensors
+      if(light.light[1] > 600) {
+        // staaaapp, and go back
+        motors.update(0, 0, IMUCorrection);
+        motors.update(-100, -100, IMUCorrection);
+        delay(1000);
+
+        // Check turn and Turn
+        if(lrfs.average(2, 4) > lrfs.average(3, 5)) {
+          direction = mod(direction + 90, 360);
+          IMUCorrection = round(IMUPID.update(imu.horizontalHeading, direction, 0));
+          while(!motors.setOrientation(IMUCorrection)) {
+            update();
+          }
+        }
+        else if(lrfs.average(3, 5) > lrfs.average(2, 4)) {
+          direction = mod(direction - 90, 360);
+          IMUCorrection = round(IMUPID.update(imu.horizontalHeading, direction, 0));
+          while(!motors.setOrientation(IMUCorrection)) {
+            update();
+          }
+        }
+      }
     }
+    // normal turn
     else {
       if(lrfs.average(2, 4) > lrfs.average(3, 5)) {
         // colorWipe(strip.Color(RED), 1);

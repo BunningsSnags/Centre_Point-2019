@@ -2,6 +2,9 @@
 
 void LightSensor::init() {
     Serial.begin(LIGHT_BAUD_RATE);
+    light[0] = 0;
+    light[1] = 0;
+    light[2] = 0;
 }
 
 void LightSensor::update() {
@@ -10,28 +13,26 @@ void LightSensor::update() {
     light[2] = analogRead(BACK_LIGHT);
 }
 
-Tile LightSensor::spotBlack(int darkness, Tile tile) {
+bool LightSensor::spotBlack(int darkness, Tile tile) {
     for(int i = 0; i < 3; i++) {
         if(light[i] > darkness) {
             tile.isBlack = true;
-            return tile;
         }
         else {
             tile.isBlack = false;
-            return tile;
         }
     }
+    return tile.isBlack;
 }
 
 Tile LightSensor::spotSilver(int brightness, Tile tile) {
     for(int i = 0; i < 3; i++) {
         if(light[i] < brightness) {
             tile.isSilver = true;
-            return tile;
         }
         else {
             tile.isSilver = false;
-            return tile;
         }
     }
+    return tile;
 }
