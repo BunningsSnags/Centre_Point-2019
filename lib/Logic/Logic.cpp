@@ -3,11 +3,36 @@
 
 Navigate is used to move around the maze
 Record is used to collect the details about the tile and add it to the array
+update is used to update all libraries
+
+lrfInput is used to collect a certain value
 
 -------------------------------------------------------------------
 */
 
-void Navigate() {
+// ============ updates ============
+void Logic::update() {
+  logic.imu.update();
+  logic.light.update();
+  logic.lrfs.update();
+  masterFlash();
+  receive();
+  IMUCorrection = round(logic.IMUPID.update(logic.imu.horizontalHeading, direction, 0));
+  LRFCorrection = constrain(round(logic.LRFPID.update(lrfInput(), 0, 0)), -300, 300);
+}
+
+int Logic::lrfInput() {
+  int leftSide = logic.lrfs.wallAverage(2, 4, logic.imu.horizontalHeading);
+  int rightSide = logic.lrfs.wallAverage(3, 5, logic.imu.horizontalHeading);
+  int16_t input = leftSide-rightSide;
+  return input;
+}
+
+
+
+// -------------------------------------- Main -----------------------------------------
+
+void Logic::Navigate() {
     // ------------ Navigate ------------
   // if(!therm.spotHeat(30)) {
     if(lrfs.average(0, 1) > 100) {
@@ -77,6 +102,6 @@ void Navigate() {
   // }
 }
 
-void Record() {
+void Logic::Record() {
 
 }

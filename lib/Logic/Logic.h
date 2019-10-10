@@ -1,4 +1,6 @@
 #ifndef LOGIC_H_
+#define LOGIC_H_
+
 #include <Common.h>
 
 // ============ Includes ============
@@ -17,6 +19,9 @@
 
 class Logic {
 public:
+    
+    Logic() {}
+
     // ============ Setups ============
     LRFs lrfs;
     MotorController motors;
@@ -24,8 +29,15 @@ public:
     MPU imu;
     PID IMUPID = PID(15, 0, 0, 255*2);
     PID LRFPID = PID(1, 0, -1.5, 255*2);
-    Adafruit_NeoPixel strip(NUM_RGB_LEDS, RGB_PIN, NEO_GRB + NEO_KHZ800);
     Tile curTile;
+
+    // ============ Functions ============
+    void Navigate();
+    void Record();
+    void update();
+
+private:
+    int lrfInput();
 };
 
 #endif

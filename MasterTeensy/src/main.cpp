@@ -1,3 +1,8 @@
+#include <Logic.h>
+Logic logic;
+Adafruit_NeoPixel strip(NUM_RGB_LEDS, RGB_PIN, NEO_GRB + NEO_KHZ800);
+
+
 // ------------ Timers ------------
 Timer ledTimer(MASTER_BLINK);
 bool ledOn = true;
@@ -19,32 +24,25 @@ void receive() {
             for(int i = 0; i < 8; i++) {
                 buffer[i] = Serial1.read();
             }
-            lrfs.value[4] = buffer[0] << 8 | buffer[1];
-            lrfs.value[5] = buffer[2] << 8 | buffer[3];
-            lrfs.value[6] = buffer[4] << 8 | buffer[5];
-            lrfs.value[7] = buffer[6] << 8 | buffer[7];
+            logic.lrfs.value[4] = buffer[0] << 8 | buffer[1];
+            logic.lrfs.value[5] = buffer[2] << 8 | buffer[3];
+            logic.lrfs.value[6] = buffer[4] << 8 | buffer[5];
+            logic.lrfs.value[7] = buffer[6] << 8 | buffer[7];
         }
     }
-}
-
-int lrfInput() {
-  int leftSide = lrfs.wallAverage(2, 4, imu.horizontalHeading);
-  int rightSide = lrfs.wallAverage(3, 5, imu.horizontalHeading);
-  int16_t input = leftSide-rightSide;
-  return input;
 }
 
 // ============ Debugers ==========````````````````````````````````````````````````````````````````````````````````````````
 void lrfsPrint() {
     for(int i = 0; i < LRF_NUM; i++) {
-        Serial.print(lrfs.value[i]);
+        Serial.print(logic.lrfs.value[i]);
         Serial.print("\t");
     }
     Serial.println("Front-Left, Front-Right, Left-Front, Right-Front, Left-Back, Right-Back, Back-Left, Back-Right");
 }
 void lightPrint() {
     for(int i = 0; i < LIGHTSENSOR_NUM; i++) {
-        Serial.print(light.light[i]);
+        Serial.print(logic.light.light[i]);
         Serial.print("\n");
     }
     Serial.println("Front1, Front2, Back");
@@ -57,9 +55,9 @@ void thermalPrint() {
     // Serial.printf("Front, Left, Right, Back, Spotted: %d\n", therm.spotHeat(30));
 }
 void imuPrint() {
-  Serial.print(imu.horizontalHeading);
+  Serial.print(logic.imu.horizontalHeading);
   Serial.print("\t");
-  Serial.print(imu.verticalHeading);
+  Serial.print(logic.imu.verticalHeading);
   Serial.print("\t");
   Serial.println("Horizontal, Vertical");
 }
@@ -182,19 +180,8 @@ void theaterChaseRainbow(uint8_t wait) {
   }
 }
 
-// ============ updates ============
-void update() {
-  imu.update();
-  light.update();
-  lrfs.update();
-  masterFlash();
-  receive();
-  IMUCorrection = round(IMUPID.update(imu.horizontalHeading, direction, 0));
-  LRFCorrection = constrain(round(LRFPID.update(lrfInput(), 0, 0)), -300, 300);
-}
-
 void tileCheck() {
-  curTile = lrfs.checkTile(curTile, imu.horizontalHeading);
+  logic.curTile = logic.lrfs.checkTile(logic.curTile, logic.imu.horizontalHeading);
   // curTile = light.spotBlack(600, curTile);
   // curTile = light.spotSilver(200, curTile);
 }
@@ -205,12 +192,12 @@ void setup() {
       Serial.begin(TEENSY_BAUD_RATE);
   #endif
   Serial1.begin(TEENSY_BAUD_RATE);
-  lrfs.init();
-  light.init();
-  motors.init();
+  logic.lrfs.init();
+  logic.light.init();
+  logic.motors.init();
   pinMode(MASTER_LED, OUTPUT);
   Serial.begin(9600);
-  imu.init();
+  logic.imu.init();
   #if defined (__AVR_ATtiny85__)
   if (F_CPU == 16000000) clock_prescale_set(clock_div_1);
   #endif
@@ -220,75 +207,9 @@ void setup() {
 }
 
 void loop() {
-  update();
+  logic.update();
   debug(dLight);
   receive();
   
-  // ------------ Navigate ------------
-  // if(!therm.spotHeat(30)) {
-    if(lrfs.average(0, 1) > 100) {
-      motors.update(150, 150, IMUCorrection);
-      // colorWipe(strip.Color(BLUE), 1);
-
-      // light sensors
-      if(light.light[1] > 600) {
-        // staaaapp, and go back
-        motors.update(0, 0, IMUCorrection);
-        motors.update(-100, -100, IMUCorrection);
-        delay(1000);
-
-        // Check turn and Turn
-        if(lrfs.average(2, 4) > lrfs.average(3, 5)) {
-          direction = mod(direction + 90, 360);
-          IMUCorrection = round(IMUPID.update(imu.horizontalHeading, direction, 0));
-          while(!motors.setOrientation(IMUCorrection)) {
-            update();
-          }
-        }
-        else if(lrfs.average(3, 5) > lrfs.average(2, 4)) {
-          direction = mod(direction - 90, 360);
-          IMUCorrection = round(IMUPID.update(imu.horizontalHeading, direction, 0));
-          while(!motors.setOrientation(IMUCorrection)) {
-            update();
-          }
-        }
-      }
-    }
-    // normal turn
-    else {
-      if(lrfs.average(2, 4) > lrfs.average(3, 5)) {
-        // colorWipe(strip.Color(RED), 1);
-        direction = mod(direction + 90, 360);
-        IMUCorrection = round(IMUPID.update(imu.horizontalHeading, direction, 0));
-        while(!motors.setOrientation(IMUCorrection)) {
-          update();
-          }
-        }
-        else if(lrfs.average(3, 5) > lrfs.average(2, 4)) {
-          // colorWipe(strip.Color(GREEN), 1);
-          direction = mod(direction - 90, 360);
-          IMUCorrection = round(IMUPID.update(imu.horizontalHeading, direction, 0));
-          while(!motors.setOrientation(IMUCorrection)) {
-            update();
-        }
-      }
-    }
-  // else {
-  //   update();
-  //   motors.update(0, 0, IMUCorrection);
-  //   colorWipe(strip.Color(GREEN), 1);
-  //   delay(100);
-  //   colorWipe(strip.Color(0, 0, 0), 1);
-  //   delay(100);
-  //   colorWipe(strip.Color(GREEN), 1);
-  //   delay(100);
-  //   colorWipe(strip.Color(0, 0, 0), 1);
-  //   delay(100);
-  //   colorWipe(strip.Color(GREEN), 1);
-  //   delay(100);
-  //   colorWipe(strip.Color(0, 0, 0), 1);
-  //   delay(100);
-  //   !therm.spotHeat(30);
-  //   therm.value[0] = 0;
-  // }
+  logic.Navigate();
 }
