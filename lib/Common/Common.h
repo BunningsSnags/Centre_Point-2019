@@ -6,6 +6,11 @@
 #include <Tile.h>
 #include <Arduino.h>
 
+double IMUCorrection;
+double LRFCorrection;
+double direction = 0;
+int objDirection = 0;
+
 
 // Debug
 #define TEENSY_BAUD_RATE 9600
