@@ -64,14 +64,3 @@ bool MotorController::setOrientation(int ofSet) {
         return false;
     }
 }
-
-// void avoidTile(Tile currentTile, bool durection) {
-//     // Move backwards
-//     update(0, 0, 0);
-//     update(-100, -100, 0);
-
-//     // Mark tile as wall
-//     // bool black = floor(heading / 4);
-//     currentTile.isBlack = true;
-//     return currentTile;
-// }
