@@ -36,6 +36,34 @@ void masterFlash() {
     }
 }
 
+void colorWipe(uint32_t c, uint8_t wait) {
+  for(uint16_t i=0; i<strip.numPixels(); i++) {
+    strip.setPixelColor(i, c);
+    strip.show();
+    delay(wait);
+  }
+}
+
+Timer rgbTimer(250);
+bool flash = false;
+int flashCounter = 0;
+void rgbFlash() {
+  if(flashCounter < 4) {
+      if(rgbTimer.timeHasPassed()){
+    rgbTimer.resetTime();
+    if(flash) {
+      colorWipe(strip.Color(0,0,0), 1);
+    } else {
+      colorWipe(strip.Color(GREEN), 1);
+      flashCounter++;
+    }
+    flash = !flash;
+  } 
+  } else {
+    colorWipe(strip.Color(0,0,0), 1);
+  }
+}
+
 // ============ Slave Teensy ============
 void receive() {
     while(Serial1.available() >= SLAVE_PACKET_SIZE) {
@@ -141,14 +169,6 @@ uint32_t Wheel(byte WheelPos) {
   return strip.Color(WheelPos * 3, 255 - WheelPos * 3, 0);
 }
 
-void colorWipe(uint32_t c, uint8_t wait) {
-  for(uint16_t i=0; i<strip.numPixels(); i++) {
-    strip.setPixelColor(i, c);
-    strip.show();
-    delay(wait);
-  }
-}
-
 void rainbow(uint8_t wait) {
   uint16_t i, j;
 
@@ -216,6 +236,7 @@ void update() {
   light.update();
   lrfs.update();
   masterFlash();
+  rgbFlash();
   receive();
   IMUCorrection = round(IMUPID.update(imu.horizontalHeading, direction, 0));
   LRFCorrection = constrain(round(LRFPID.update(lrfInput(), 0, 0)), -300, 300);
@@ -243,7 +264,7 @@ void setup() {
   if (F_CPU == 16000000) clock_prescale_set(clock_div_1);
   #endif
   strip.begin();
-  strip.setBrightness(20);
+  strip.setBrightness(10);
   strip.show();
 }
 
@@ -302,21 +323,7 @@ void loop() {
       }
     }
   // else {
-  //   update();
-  //   motors.update(0, 0, IMUCorrection);
-  //   colorWipe(strip.Color(GREEN), 1);
-  //   delay(100);
-  //   colorWipe(strip.Color(0, 0, 0), 1);
-  //   delay(100);
-  //   colorWipe(strip.Color(GREEN), 1);
-  //   delay(100);
-  //   colorWipe(strip.Color(0, 0, 0), 1);
-  //   delay(100);
-  //   colorWipe(strip.Color(GREEN), 1);
-  //   delay(100);
-  //   colorWipe(strip.Color(0, 0, 0), 1);
-  //   delay(100);
-  //   !therm.spotHeat(30);
-  //   therm.value[0] = 0;
-  // }
+  // motors.update(0, 0, IMUCorrection);
+  // flashCounter = -2;
+
 }
