@@ -236,7 +236,7 @@ void update() {
   light.update();
   lrfs.update();
   masterFlash();
-  rgbFlash();
+  // rgbFlash();
   receive();
   IMUCorrection = round(IMUPID.update(imu.horizontalHeading, direction, 0));
   LRFCorrection = constrain(round(LRFPID.update(lrfInput(), 0, 0)), -300, 300);
@@ -266,37 +266,38 @@ void setup() {
   strip.begin();
   strip.setBrightness(10);
   strip.show();
+  // imu.verticalHeading = 2;
 }
 
 void loop() {
   update();
-  debug(dLight);
+  debug(dImu);
   receive();
   
   // ------------ Navigate ------------
   // if(!therm.spotHeat(30)) {
     if(lrfs.average(0, 1) > 100) {
       motors.update(150, 150, IMUCorrection);
-      // colorWipe(strip.Color(BLUE), 1);
+      // colorWipe(strip.Color(BLUE), 1);     
 
       // light sensors
-      if(light.light[1] > 600) {
+      if(light.light[1] > 600 || light.light[0] > 600) {
         // staaaapp, and go back
         motors.update(0, 0, IMUCorrection);
         motors.update(-100, -100, IMUCorrection);
-        delay(1000);
+        delay(2000);
 
         // Check turn and Turn
         if(lrfs.average(2, 4) > lrfs.average(3, 5)) {
           direction = mod(direction + 90, 360);
-          IMUCorrection = round(IMUPID.update(imu.horizontalHeading, direction, 0));
+          IMUCorrection = round(IMUPID.update(imu.horizontalHeading, direction, 360));
           while(!motors.setOrientation(IMUCorrection)) {
             update();
           }
         }
         else if(lrfs.average(3, 5) > lrfs.average(2, 4)) {
           direction = mod(direction - 90, 360);
-          IMUCorrection = round(IMUPID.update(imu.horizontalHeading, direction, 0));
+          IMUCorrection = round(IMUPID.update(imu.horizontalHeading, direction, 360));
           while(!motors.setOrientation(IMUCorrection)) {
             update();
           }
@@ -321,6 +322,13 @@ void loop() {
             update();
         }
       }
+      else {
+        direction = mod(direction + 180, 360);
+        IMUCorrection = round(IMUPID.update(imu.horizontalHeading, direction, 0));
+        while(!motors.setOrientation(IMUCorrection)) {
+          update();
+          }
+        }
     }
   // else {
   // motors.update(0, 0, IMUCorrection);

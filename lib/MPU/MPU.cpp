@@ -34,7 +34,7 @@ void MPU::update() {
         previousDrift = millis();
     }
 	horizontalHeading = floatMod(horizontalHeading, 360);
-    verticalHeading = floatMod(verticalHeading, 360);
+    verticalHeading = floatMod(verticalHeading, 180);
     delay(10);
     // Serial.println(round(horizontalHeading/90));
 }
