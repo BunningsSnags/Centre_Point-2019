@@ -17,7 +17,7 @@ LRFs lrfs;
 MotorController motors;
 LightSensor light;
 MPU imu;
-PID IMUPID = PID(15, 0, 0, 255*2);
+PID IMUPID = PID(15, 0, 20, 255*2);
 PID LRFPID = PID(1, 0, -1.5, 255*2);
 Adafruit_NeoPixel strip(NUM_RGB_LEDS, RGB_PIN, NEO_GRB + NEO_KHZ800);
 Tile curTile;
@@ -42,6 +42,18 @@ void colorWipe(uint32_t c, uint8_t wait) {
     strip.show();
     delay(wait);
   }
+}
+
+int getCamera() {
+  int val = 0;
+  if(Serial6.available() > 6) {
+    if(Serial6.read() == 255) {
+      int high = Serial6.read();
+      int low = Serial6.read();
+      val = (low >> 8) + high;
+    }
+  }
+  return val;
 }
 
 Timer rgbTimer(250);
@@ -271,13 +283,20 @@ void setup() {
 
 void loop() {
   update();
-  debug(dImu);
+  // debug(dLrfs);
+  // debug(dImu);
   receive();
+
+  // Serial.println(getCamera());
+
+  // while(true) {
+  //   Serial.println("Test");
+  // }
   
   // ------------ Navigate ------------
   // if(!therm.spotHeat(30)) {
     if(lrfs.average(0, 1) > 100) {
-      motors.update(150, 150, IMUCorrection);
+      motors.update(130, 130, IMUCorrection);
       // colorWipe(strip.Color(BLUE), 1);     
 
       // light sensors
@@ -322,16 +341,8 @@ void loop() {
             update();
         }
       }
-      else {
-        direction = mod(direction + 180, 360);
-        IMUCorrection = round(IMUPID.update(imu.horizontalHeading, direction, 0));
-        while(!motors.setOrientation(IMUCorrection)) {
-          update();
-          }
-        }
     }
   // else {
   // motors.update(0, 0, IMUCorrection);
   // flashCounter = -2;
-
 }
