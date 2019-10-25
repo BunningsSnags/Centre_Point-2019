@@ -42,6 +42,12 @@
 #define LIGHTSENSOR_NUM 3
 #define LIGHT_VALUE_START 0
 
+// Camera
+#define CAM_PACKET_SIZE 2
+#define CAM_BAUD 9600
+#define CAM_START_BYTE 255
+#define camSerial Serial5
+
 
 // RGB Leds
 #define NUM_RGB_LEDS 60

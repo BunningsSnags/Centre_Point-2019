@@ -8,6 +8,7 @@
 #include <MPU.h>
 #include <PID.h>
 #include <Tile.h>
+#include <Camera.h>
 #ifdef __AVR__
   #include <avr/power.h>
 #endif
@@ -21,6 +22,7 @@ PID IMUPID = PID(15, 0, 20, 255*2);
 PID LRFPID = PID(1, 0, -1.5, 255*2);
 Adafruit_NeoPixel strip(NUM_RGB_LEDS, RGB_PIN, NEO_GRB + NEO_KHZ800);
 Tile curTile;
+Camera cam;
 double IMUCorrection;
 double LRFCorrection;
 double direction = 0;
@@ -34,26 +36,6 @@ void masterFlash() {
         digitalWrite(MASTER_LED, ledOn);
         ledOn = !ledOn;
     }
-}
-
-void colorWipe(uint32_t c, uint8_t wait) {
-  for(uint16_t i=0; i<strip.numPixels(); i++) {
-    strip.setPixelColor(i, c);
-    strip.show();
-    delay(wait);
-  }
-}
-
-int getCamera() {
-  int val = 0;
-  if(Serial6.available() > 6) {
-    if(Serial6.read() == 255) {
-      int high = Serial6.read();
-      int low = Serial6.read();
-      val = (low >> 8) + high;
-    }
-  }
-  return val;
 }
 
 Timer rgbTimer(250);
@@ -181,6 +163,14 @@ uint32_t Wheel(byte WheelPos) {
   return strip.Color(WheelPos * 3, 255 - WheelPos * 3, 0);
 }
 
+void colorWipe(uint32_t c, uint8_t wait) {
+  for(uint16_t i=0; i<strip.numPixels(); i++) {
+    strip.setPixelColor(i, c);
+    strip.show();
+    delay(wait);
+  }
+}
+
 void rainbow(uint8_t wait) {
   uint16_t i, j;
 
@@ -248,7 +238,7 @@ void update() {
   light.update();
   lrfs.update();
   masterFlash();
-  // rgbFlash();
+  rgbFlash();
   receive();
   IMUCorrection = round(IMUPID.update(imu.horizontalHeading, direction, 0));
   LRFCorrection = constrain(round(LRFPID.update(lrfInput(), 0, 0)), -300, 300);
@@ -278,23 +268,16 @@ void setup() {
   strip.begin();
   strip.setBrightness(10);
   strip.show();
+  cam.init();
   // imu.verticalHeading = 2;
 }
 
 void loop() {
   update();
   // debug(dLrfs);
-  // debug(dImu);
-  receive();
-
-  // Serial.println(getCamera());
-
-  // while(true) {
-  //   Serial.println("Test");
-  // }
   
   // ------------ Navigate ------------
-  // if(!therm.spotHeat(30)) {
+  if(!cam.isThere(20)) {
     if(lrfs.average(0, 1) > 100) {
       motors.update(130, 130, IMUCorrection);
       // colorWipe(strip.Color(BLUE), 1);     
@@ -342,7 +325,8 @@ void loop() {
         }
       }
     }
-  // else {
-  // motors.update(0, 0, IMUCorrection);
-  // flashCounter = -2;
+  else {
+  motors.update(0, 0, IMUCorrection);
+  flashCounter = -2;
+  isThere(20) = false;
 }
