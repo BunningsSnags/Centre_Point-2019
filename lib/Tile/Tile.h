@@ -11,6 +11,7 @@ struct Tile {
     bool isRampUp;
     bool isRampDown;
     bool isExplored;
+    bool predictedTile;
     int pos[2];
     int floorNum;
 };
