@@ -275,6 +275,8 @@ void setup() {
 void loop() {
   update();
   // debug(dLrfs);
+
+  motors.update(100, -100);
   
   // ------------ Navigate ------------
   if(!cam.isThere(20)) {
