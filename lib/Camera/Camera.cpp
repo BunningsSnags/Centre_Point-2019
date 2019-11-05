@@ -5,7 +5,7 @@ void Camera::init() {
 }
 
 int Camera::read() {
-    if(camSerial.avaliable() >= CAM_PACKET_SIZE) {
+    if(camSerial.available() >= CAM_PACKET_SIZE) {
         if(camSerial.read() == CAM_START_BYTE) {
             uint8_t camBuffer[CAM_PACKET_SIZE - 1];
 
@@ -13,7 +13,7 @@ int Camera::read() {
                 camBuffer[i] = camSerial.read();
             }
 
-            redDistance = camBuffer[i];
+            redDistance = camBuffer[0];
 
         }
     }

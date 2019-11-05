@@ -1,6 +1,8 @@
 #ifndef CAMERA_H_
 #define CAMERA_H_
 
+#include <Common.h>
+
 class Camera {
 public:
     Camera() {}

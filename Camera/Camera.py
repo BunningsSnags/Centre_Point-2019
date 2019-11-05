@@ -1,9 +1,10 @@
 import sensor, image
 from pyb import UART, LED
+from math import sqrt
 
 centreX = 120
 centreY = 120
-redTHRESHOLD = [(57, 77, 18, 70, -10, 61)]
+redTHRESHOLD = [(0, 64, 12, 78, 45, 83)]
 vWin = (0,0,120,120)
 
 DEBUGGING = True

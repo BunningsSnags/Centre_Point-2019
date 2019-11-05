@@ -46,7 +46,7 @@
 #define CAM_PACKET_SIZE 2
 #define CAM_BAUD 9600
 #define CAM_START_BYTE 255
-#define camSerial Serial5
+#define camSerial Serial6
 
 
 // RGB Leds

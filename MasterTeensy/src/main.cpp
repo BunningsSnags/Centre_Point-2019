@@ -41,22 +41,22 @@ void masterFlash() {
 Timer rgbTimer(250);
 bool flash = false;
 int flashCounter = 0;
-void rgbFlash() {
-  if(flashCounter < 4) {
-      if(rgbTimer.timeHasPassed()){
-    rgbTimer.resetTime();
-    if(flash) {
-      colorWipe(strip.Color(0,0,0), 1);
-    } else {
-      colorWipe(strip.Color(GREEN), 1);
-      flashCounter++;
-    }
-    flash = !flash;
-  } 
-  } else {
-    colorWipe(strip.Color(0,0,0), 1);
-  }
-}
+// void rgbFlash() {
+//   if(flashCounter < 4) {
+//       if(rgbTimer.timeHasPassed()){
+//     rgbTimer.resetTime();
+//     if(flash) {
+//       colorWipe(strip.Color(0,0,0), 1);
+//     } else {
+//       colorWipe(strip.Color(GREEN), 1);
+//       flashCounter++;
+//     }
+//     flash = !flash;
+//   } 
+//   } else {
+//     colorWipe(strip.Color(0,0,0), 1);
+//   }
+// }
 
 // ============ Slave Teensy ============
 void receive() {
@@ -238,7 +238,7 @@ void update() {
   light.update();
   lrfs.update();
   masterFlash();
-  rgbFlash();
+  // rgbFlash();
   receive();
   IMUCorrection = round(IMUPID.update(imu.horizontalHeading, direction, 0));
   LRFCorrection = constrain(round(LRFPID.update(lrfInput(), 0, 0)), -300, 300);
@@ -277,7 +277,7 @@ void loop() {
   // debug(dLrfs);
   
   // ------------ Navigate ------------
-  if(!cam.isThere(20)) {
+  // if(!cam.isThere(20)) {
     if(lrfs.average(0, 1) > 100) {
       motors.update(130, 130, IMUCorrection);
       // colorWipe(strip.Color(BLUE), 1);     
@@ -325,8 +325,8 @@ void loop() {
         }
       }
     }
-  else {
-  motors.update(0, 0, IMUCorrection);
-  flashCounter = -2;
-  isThere(20) = false;
+  // else {
+  // motors.update(0, 0, IMUCorrection);
+  // flashCounter = -2;
+  // isThere(20) = false;
 }
