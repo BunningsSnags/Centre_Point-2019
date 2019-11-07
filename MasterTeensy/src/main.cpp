@@ -183,7 +183,7 @@ void rainbow(uint8_t wait) {
   }
 }
 
-// Slightly different, this makes the rainbow equally distributed throughout
+// Slightly different, this makes the rainbow equally distributed throughout leds
 void rainbowCycle(uint8_t wait) {
   uint16_t i, j;
 
@@ -283,7 +283,7 @@ void loop() {
       // colorWipe(strip.Color(BLUE), 1);     
 
       // light sensors
-      if(light.light[1] > 600 || light.light[0] > 600) {
+      if(light.spotBlack(500)) {
         // staaaapp, and go back
         motors.update(0, 0, IMUCorrection);
         motors.update(-100, -100, IMUCorrection);
