@@ -14,16 +14,16 @@ lrfInput is used to collect a certain value
 
 // ============ updates ============
 void Logic::update() {
-  logic.imu.update();
-  logic.light.update();
-  logic.lrfs.update();
-  IMUCorrection = round(logic.IMUPID.update(logic.imu.horizontalHeading, direction, 0));
-  LRFCorrection = constrain(round(logic.LRFPID.update(lrfInput(), 0, 0)), -300, 300);
+  imu.update();
+  light.update();
+  lrfs.update();
+  IMUCorrection = round(IMUPID.update(imu.horizontalHeading, direction, 0));
+  LRFCorrection = constrain(round(LRFPID.update(lrfInput(), 0, 0)), -300, 300);
 }
 
 int Logic::lrfInput() {
-  int leftSide = logic.lrfs.wallAverage(2, 4, logic.imu.horizontalHeading);
-  int rightSide = logic.lrfs.wallAverage(3, 5, logic.imu.horizontalHeading);
+  int leftSide = lrfs.wallAverage(2, 4, imu.horizontalHeading);
+  int rightSide = lrfs.wallAverage(3, 5, imu.horizontalHeading);
   int16_t input = leftSide-rightSide;
   return input;
 }
@@ -33,7 +33,7 @@ int Logic::lrfInput() {
 // -------------------------------------- Main -----------------------------------------
 
 void Logic::Navigate() {
-    // ------------ Navigate ------------
+    // *! ------------ Navigate Single Tile ------------
   // if(!therm.spotHeat(30)) {
     if(lrfs.average(0, 1) > 100) {
       motors.update(150, 150, IMUCorrection);
@@ -102,6 +102,6 @@ void Logic::Navigate() {
   // }
 }
 
-void Logic::Record() {
+void Logic::checkTile() {
 
 }

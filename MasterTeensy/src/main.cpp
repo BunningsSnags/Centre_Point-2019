@@ -1,5 +1,5 @@
 #include <Logic.h>
-Logic logic;
+Logic logs;
 Adafruit_NeoPixel strip(NUM_RGB_LEDS, RGB_PIN, NEO_GRB + NEO_KHZ800);
 
 
@@ -24,10 +24,10 @@ void receive() {
             for(int i = 0; i < 8; i++) {
                 buffer[i] = Serial1.read();
             }
-            logic.lrfs.value[4] = buffer[0] << 8 | buffer[1];
-            logic.lrfs.value[5] = buffer[2] << 8 | buffer[3];
-            logic.lrfs.value[6] = buffer[4] << 8 | buffer[5];
-            logic.lrfs.value[7] = buffer[6] << 8 | buffer[7];
+            logs.lrfs.value[4] = buffer[0] << 8 | buffer[1];
+            logs.lrfs.value[5] = buffer[2] << 8 | buffer[3];
+            logs.lrfs.value[6] = buffer[4] << 8 | buffer[5];
+            logs.lrfs.value[7] = buffer[6] << 8 | buffer[7];
         }
     }
 }
@@ -35,14 +35,14 @@ void receive() {
 // ============ Debugers ==========````````````````````````````````````````````````````````````````````````````````````````
 void lrfsPrint() {
     for(int i = 0; i < LRF_NUM; i++) {
-        Serial.print(logic.lrfs.value[i]);
+        Serial.print(logs.lrfs.value[i]);
         Serial.print("\t");
     }
     Serial.println("Front-Left, Front-Right, Left-Front, Right-Front, Left-Back, Right-Back, Back-Left, Back-Right");
 }
 void lightPrint() {
     for(int i = 0; i < LIGHTSENSOR_NUM; i++) {
-        Serial.print(logic.light.light[i]);
+        Serial.print(logs.light.light[i]);
         Serial.print("\n");
     }
     Serial.println("Front1, Front2, Back");
@@ -55,9 +55,9 @@ void thermalPrint() {
     // Serial.printf("Front, Left, Right, Back, Spotted: %d\n", therm.spotHeat(30));
 }
 void imuPrint() {
-  Serial.print(logic.imu.horizontalHeading);
+  Serial.print(logs.imu.horizontalHeading);
   Serial.print("\t");
-  Serial.print(logic.imu.verticalHeading);
+  Serial.print(logs.imu.verticalHeading);
   Serial.print("\t");
   Serial.println("Horizontal, Vertical");
 }
@@ -173,7 +173,7 @@ void theaterChaseRainbow(uint8_t wait) {
 }
 
 void tileCheck() {
-  logic.curTile = logic.lrfs.checkTile(logic.curTile, logic.imu.horizontalHeading);
+  logs.curTile = logs.lrfs.checkTile(logs.curTile, logs.imu.horizontalHeading);
   // curTile = light.spotBlack(600, curTile);
   // curTile = light.spotSilver(200, curTile);
 }
@@ -184,12 +184,12 @@ void setup() {
       Serial.begin(TEENSY_BAUD_RATE);
   #endif
   Serial1.begin(TEENSY_BAUD_RATE);
-  logic.lrfs.init();
-  logic.light.init();
-  logic.motors.init();
+  logs.lrfs.init();
+  logs.light.init();
+  logs.motors.init();
   pinMode(MASTER_LED, OUTPUT);
   Serial.begin(9600);
-  logic.imu.init();
+  logs.imu.init();
   #if defined (__AVR_ATtiny85__)
   if (F_CPU == 16000000) clock_prescale_set(clock_div_1);
   #endif
@@ -204,9 +204,9 @@ void updateMain() {
 }
 
 void loop() {
-  logic.update();
+  logs.update();
   debug(dLight);
   updateMain();
   
-  logic.Navigate();
+  logs.Navigate();
 }

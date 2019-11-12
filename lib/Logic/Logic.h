@@ -33,7 +33,7 @@ public:
 
     // ============ Functions ============
     void Navigate();
-    void Record();
+    void checkTile();
     void update();
 
 private:
