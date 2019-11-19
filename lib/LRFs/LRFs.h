@@ -12,6 +12,7 @@ public:
     uint16_t average(int lrf1, int lrf2);
     uint16_t value[LRF_NUM] = {0};
     Tile checkTile(Tile tile, double heading);
+    int tileDist(double heading);
 private:
     uint16_t averaged = 0;
 };

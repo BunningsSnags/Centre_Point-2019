@@ -18,7 +18,7 @@ LRFs lrfs;
 MotorController motors;
 LightSensor light;
 MPU imu;
-PID IMUPID = PID(15, 0, 20, 255*2);
+PID IMUPID = PID(10, 0, 0, 255*2);
 PID LRFPID = PID(1, 0, -1.5, 255*2);
 Tile curTile;
 Camera cam;
@@ -154,7 +154,7 @@ void update() {
   masterFlash();
   // rgbFlash();
   receive();
-  IMUCorrection = round(IMUPID.update(imu.horizontalHeading, direction, 0));
+  IMUCorrection = -round(IMUPID.update(imu.horizontalHeading, direction, 0));
   LRFCorrection = constrain(round(LRFPID.update(lrfInput(), 0, 0)), -300, 300);
 }
 
@@ -186,18 +186,26 @@ void setup() {
 void loop() {
   update();
   // debug(dLrfs);
-  
-  // ------------ Navigate ------------
+
+  Serial.println(lrfs.tileDist(imu.horizontalHeading));
+  if(lrfs.wallAverage(6, 7, imu.horizontalHeading) < (lrfs.tileDist(imu.horizontalHeading)+300)) {
+    motors.update(100, 100, IMUCorrection);
+  }
+  else {
+    motors.update(0, 0, IMUCorrection);
+  }
+
+  //* ------------ Navigate ------------
   // if(!cam.isThere(20)) {
     if(lrfs.average(0, 1) > 100) {
-      motors.update(130, 130, IMUCorrection);
+      motors.update(SPEED, SPEED, IMUCorrection);
       // colorWipe(strip.Color(BLUE), 1);     
 
       // light sensors
       if(light.spotBlack(500)) {
         // staaaapp, and go back
         motors.update(0, 0, IMUCorrection);
-        motors.update(-100, -100, IMUCorrection);
+        motors.update(-SPEED, -SPEED, IMUCorrection);
         delay(2000);
 
         // Check turn and Turn
@@ -240,4 +248,30 @@ void loop() {
   // motors.update(0, 0, IMUCorrection);
   // flashCounter = -2;
   // isThere(20) = false;
+
+  // ** Try and get the navigation functions made
+  /**
+   *? checkTile() is when all things on the tile are recorded including walls
+   *? pathFind() the robot will choose a direction depending on the checkTile answers and set an endpoint
+   *? Navigate(pathFind) will simply navigate to wherever the endpoint is set at
+   *? avoidTile() means that it will first avoid the tile and then tell the checkTile function if its a black tile or ramp
+  */
+  /** 
+   * ! checkTile();
+   * ! if(victim) {
+   * !   victimSave();
+   * ! }
+   * ! pathFind();
+   * ! if(!blackTile) {
+   * !    if(!ramp) {
+   * !      Navigate(pathFind);
+   * !    }
+   * !    else {
+   * !      avoidTile(ramp);
+   * !    }
+   * !  }
+   * ! else {
+   * !  avoidTile(blackTile);
+   * ! }
+  */
 }

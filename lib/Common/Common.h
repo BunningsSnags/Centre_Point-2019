@@ -101,7 +101,7 @@
 
 
 // Motor
-#define SPEED 150
+#define SPEED 255
 
 // Tracking
 #define mSize 15

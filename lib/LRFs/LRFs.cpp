@@ -20,7 +20,10 @@ uint16_t LRFs::wallAverage(int lrf1, int lrf2, double heading) {
     return averaged;
 }
 
-// bool walls[4] = {LEFT, RIGHT, FRONT, BACK};
+int LRFs::tileDist(double heading) {
+    int value = wallAverage(6, 7, heading);
+    return value;
+}
 
 Tile LRFs::checkTile(Tile tile, double heading) {
     // North
