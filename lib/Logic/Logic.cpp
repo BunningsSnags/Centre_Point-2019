@@ -11,6 +11,9 @@ lrfInput is used to collect a certain value
 */
 
 #include <Logic.h>
+#include <math.h>
+
+// reCalibrate = constrain(round(LRFPID.update(lrfInput(), 0, 0)), -300, 300);
 
 // ============ updates ============
 void Logic::update() {
@@ -19,12 +22,20 @@ void Logic::update() {
   lrfs.update();
   IMUCorrection = round(IMUPID.update(imu.horizontalHeading, direction, 0));
   LRFCorrection = constrain(round(LRFPID.update(lrfInput(), 0, 0)), -300, 300);
+  reCalibrate = round(LRFPID.update(lrfInput(), 0, 0));
 }
 
 int Logic::lrfInput() {
   int leftSide = lrfs.wallAverage(2, 4, imu.horizontalHeading);
   int rightSide = lrfs.wallAverage(3, 5, imu.horizontalHeading);
   int16_t input = leftSide-rightSide;
+  return input;
+}
+
+int Logic::calibrate() {
+  int left = lrfs.value[6] * abs(cos(heading * PI/180));
+  int right = lrfs.value[7] * abs(cos(heading * PI/180));
+  int input = left-right;
   return input;
 }
 

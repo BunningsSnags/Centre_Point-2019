@@ -1,5 +1,4 @@
 #include <LRFs.h>
-#include <math.h>
 
 void LRFs::init() {
     Serial2.begin(LRF_BAUD_RATE);

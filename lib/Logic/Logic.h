@@ -19,25 +19,31 @@
 
 class Logic {
 public:
-    
-    Logic() {}
+  Logic() {}
 
-    // ============ Setups ============
-    LRFs lrfs;
-    MotorController motors;
-    LightSensor light;
-    MPU imu;
-    PID IMUPID = PID(15, 0, 0, 255*2);
-    PID LRFPID = PID(1, 0, -1.5, 255*2);
-    Tile curTile;
+  double IMUCorrection;
+  double LRFCorrection;
+  double reCalibrate;
+  double direction = 0;
+  int objDirection = 0;
 
-    // ============ Functions ============
-    void Navigate();
-    void checkTile();
-    void update();
+  // ============ Setups ============
+  LRFs lrfs;
+  MotorController motors;
+  LightSensor light;
+  MPU imu;
+  PID IMUPID = PID(15, 0, 0, 255*2);
+  PID LRFPID = PID(1, 0, -1.5, 255*2);
+  Tile curTile;
+
+  // ============ Functions ============
+  void Navigate();
+  void checkTile();
+  void update();
 
 private:
     int lrfInput();
+    int calibrate();
 };
 
 #endif

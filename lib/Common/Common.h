@@ -5,12 +5,7 @@
 #include <Colours.h>
 #include <Tile.h>
 #include <Arduino.h>
-
-double IMUCorrection;
-double LRFCorrection;
-double direction = 0;
-int objDirection = 0;
-
+#include <math.h>
 
 // Debug
 #define TEENSY_BAUD_RATE 9600
