@@ -48,7 +48,3 @@ while true:
 
         if redColour:
             img.draw_rectangle(redColour.rect())
-        if redColour:
-            # find out how to check distance from object
-            if # distance below 100mm
-                # drop cube
